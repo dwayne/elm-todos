@@ -1,5 +1,12 @@
 module Todo exposing (main)
 
-import Html
+import Html exposing (..)
+import Html.Attributes exposing (..)
 
-main = Html.text "Hello, Elm!"
+main =
+  input
+    [ type_ "text"
+    , autofocus True
+    , placeholder "What needs to be done?"
+    ]
+    []
