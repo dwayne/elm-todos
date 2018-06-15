@@ -25,6 +25,7 @@ model =
 
 type Msg
   = SetDescription String
+  | AddEntry
 
 update : Msg -> Model -> Model
 update msg model =
@@ -32,15 +33,27 @@ update msg model =
     SetDescription description ->
       { model | description = description }
 
+    AddEntry ->
+      let
+        cleanDescription =
+          String.trim model.description
+      in
+        if String.isEmpty cleanDescription then
+          model
+        else
+          Debug.log cleanDescription { model | description = "" }
+
 -- VIEW
 
 view : Model -> Html Msg
 view { description } =
-  input
-    [ type_ "text"
-    , autofocus True
-    , placeholder "What needs to be done?"
-    , value description
-    , Events.onInput SetDescription
+  Html.form [ Events.onSubmit AddEntry ]
+    [ input
+        [ type_ "text"
+        , autofocus True
+        , placeholder "What needs to be done?"
+        , value description
+        , Events.onInput SetDescription
+        ]
+        []
     ]
-    []
