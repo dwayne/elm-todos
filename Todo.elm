@@ -15,18 +15,21 @@ main =
 -- MODEL
 
 type alias Model =
-  { description : String
+  { uid : Int
+  , description : String
   , entries : List Entry
   }
 
 type alias Entry =
-  { description : String
+  { uid : Int
+  , description : String
   , completed : Bool
   }
 
 model : Model
 model =
-  { description = ""
+  { uid = 0
+  , description = ""
   , entries = []
   }
 
@@ -35,7 +38,7 @@ model =
 type Msg
   = SetDescription String
   | AddEntry
-  | ToggleEntry Bool
+  | ToggleEntry Int Bool
 
 update : Msg -> Model -> Model
 update msg model =
@@ -52,17 +55,24 @@ update msg model =
           model
         else
           { model
-          | description = ""
-          , entries = model.entries ++ [ createEntry cleanDescription ]
+          | uid = model.uid + 1
+          , description = ""
+          , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
           }
 
-    ToggleEntry completed ->
-      -- Hmmm. Which entry do we update?
-      model
+    ToggleEntry uid completed ->
+      let
+        updateEntry entry =
+          if entry.uid == uid then
+            { entry | completed = completed }
+          else
+            entry
+      in
+        { model | entries = List.map updateEntry model.entries }
 
-createEntry : String -> Entry
-createEntry description =
-  { description = description, completed = False }
+createEntry : Int -> String -> Entry
+createEntry uid description =
+  { uid = uid, description = description, completed = False }
 
 -- VIEW
 
@@ -83,12 +93,12 @@ view { description, entries } =
     ]
 
 viewEntry : Entry -> Html Msg
-viewEntry { description, completed } =
+viewEntry { uid, description, completed } =
   div []
     [ input
         [ type_ "checkbox"
         , checked completed
-        , Events.onCheck ToggleEntry
+        , Events.onCheck (ToggleEntry uid)
         ]
         []
     , text description
