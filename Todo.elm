@@ -101,5 +101,7 @@ viewEntry { uid, description, completed } =
         , Events.onCheck (ToggleEntry uid)
         ]
         []
-    , text description
+    , span
+        [ classList [ ("line-through", completed) ] ]
+        [ text description ]
     ]
