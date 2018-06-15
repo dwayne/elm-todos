@@ -15,11 +15,15 @@ main =
 -- MODEL
 
 type alias Model =
-  { description : String }
+  { description : String
+  , entries : List String
+  }
 
 model : Model
 model =
-  { description = "" }
+  { description = ""
+  , entries = []
+  }
 
 -- UPDATE
 
@@ -41,19 +45,25 @@ update msg model =
         if String.isEmpty cleanDescription then
           model
         else
-          Debug.log cleanDescription { model | description = "" }
+          { model
+          | description = ""
+          , entries = model.entries ++ [ cleanDescription ]
+          }
 
 -- VIEW
 
 view : Model -> Html Msg
-view { description } =
-  Html.form [ Events.onSubmit AddEntry ]
-    [ input
-        [ type_ "text"
-        , autofocus True
-        , placeholder "What needs to be done?"
-        , value description
-        , Events.onInput SetDescription
+view { description, entries } =
+  div []
+    [ Html.form [ Events.onSubmit AddEntry ]
+        [ input
+            [ type_ "text"
+            , autofocus True
+            , placeholder "What needs to be done?"
+            , value description
+            , Events.onInput SetDescription
+            ]
+            []
         ]
-        []
+    , ul [] (List.map (\description -> li [] [ text description ]) entries)
     ]
