@@ -16,7 +16,12 @@ main =
 
 type alias Model =
   { description : String
-  , entries : List String
+  , entries : List Entry
+  }
+
+type alias Entry =
+  { description : String
+  , completed : Bool
   }
 
 model : Model
@@ -47,8 +52,12 @@ update msg model =
         else
           { model
           | description = ""
-          , entries = model.entries ++ [ cleanDescription ]
+          , entries = model.entries ++ [ createEntry cleanDescription ]
           }
+
+createEntry : String -> Entry
+createEntry description =
+  { description = description, completed = False }
 
 -- VIEW
 
@@ -65,5 +74,9 @@ view { description, entries } =
             ]
             []
         ]
-    , ul [] (List.map (\description -> li [] [ text description ]) entries)
+    , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
     ]
+
+viewEntry : Entry -> Html msg
+viewEntry { description } =
+  text description
