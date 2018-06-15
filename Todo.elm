@@ -35,6 +35,7 @@ model =
 type Msg
   = SetDescription String
   | AddEntry
+  | ToggleEntry Bool
 
 update : Msg -> Model -> Model
 update msg model =
@@ -54,6 +55,10 @@ update msg model =
           | description = ""
           , entries = model.entries ++ [ createEntry cleanDescription ]
           }
+
+    ToggleEntry completed ->
+      -- Hmmm. Which entry do we update?
+      model
 
 createEntry : String -> Entry
 createEntry description =
@@ -77,12 +82,13 @@ view { description, entries } =
     , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
     ]
 
-viewEntry : Entry -> Html msg
+viewEntry : Entry -> Html Msg
 viewEntry { description, completed } =
   div []
     [ input
         [ type_ "checkbox"
         , checked completed
+        , Events.onCheck ToggleEntry
         ]
         []
     , text description
