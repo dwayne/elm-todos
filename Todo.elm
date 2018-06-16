@@ -95,33 +95,46 @@ createEntry uid description =
 view : Model -> Html Msg
 view { description, entries } =
   div []
-    [ Html.form [ Events.onSubmit AddEntry ]
-        [ input
-            [ type_ "text"
-            , autofocus True
-            , placeholder "What needs to be done?"
-            , value description
-            , Events.onInput SetDescription
-            ]
-            []
-        ]
-    , label []
-        [ input
-           [ type_ "checkbox"
-           , checked (List.all .completed entries)
-           , Events.onCheck ToggleEntries
-           ]
-           []
-        , text "Mark all as completed"
-        ]
-    , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
-    , viewNumIncompleteEntries entries
-    , button
-        [ type_ "button"
-        , Events.onClick RemoveCompletedEntries
-        ]
-        [ text "Clear completed" ]
+    [ viewPrompt description
+    , viewBody entries
     ]
+
+viewPrompt : String -> Html Msg
+viewPrompt description =
+  Html.form [ Events.onSubmit AddEntry ]
+    [ input
+        [ type_ "text"
+        , autofocus True
+        , placeholder "What needs to be done?"
+        , value description
+        , Events.onInput SetDescription
+        ]
+        []
+    ]
+
+viewBody : List Entry -> Html Msg
+viewBody entries =
+  if List.isEmpty entries then
+    text ""
+  else
+    div []
+      [ label []
+          [ input
+             [ type_ "checkbox"
+             , checked (List.all .completed entries)
+             , Events.onCheck ToggleEntries
+             ]
+             []
+          , text "Mark all as completed"
+          ]
+      , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
+      , viewNumIncompleteEntries entries
+      , button
+          [ type_ "button"
+          , Events.onClick RemoveCompletedEntries
+          ]
+          [ text "Clear completed" ]
+      ]
 
 viewEntry : Entry -> Html Msg
 viewEntry { uid, description, completed } =
