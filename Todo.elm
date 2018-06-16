@@ -3,6 +3,7 @@ module Todo exposing (main)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as Events
+import Html.Keyed as Keyed
 
 main : Program Never Model Msg
 main =
@@ -134,7 +135,10 @@ viewBody visible entries =
              []
           , text "Mark all as completed"
           ]
-      , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) (keep visible entries))
+      , Keyed.ul []
+          <| List.map
+              (\entry -> (toString entry.uid, li [] [ viewEntry entry ]))
+              (keep visible entries)
       , viewNumIncompleteEntries entries
       , button
           [ type_ "button"
