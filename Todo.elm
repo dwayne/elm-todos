@@ -62,7 +62,7 @@ update msg model =
           }
 
     RemoveEntry uid ->
-      Debug.log ("Remove entry: " ++ toString uid) model
+      { model | entries = List.filter (\entry -> entry.uid /= uid) model.entries }
 
     ToggleEntry uid completed ->
       let
