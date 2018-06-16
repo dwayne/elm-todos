@@ -38,6 +38,7 @@ model =
 type Msg
   = SetDescription String
   | AddEntry
+  | RemoveEntry Int
   | ToggleEntry Int Bool
 
 update : Msg -> Model -> Model
@@ -59,6 +60,9 @@ update msg model =
           , description = ""
           , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
           }
+
+    RemoveEntry uid ->
+      Debug.log ("Remove entry: " ++ toString uid) model
 
     ToggleEntry uid completed ->
       let
@@ -104,4 +108,10 @@ viewEntry { uid, description, completed } =
     , span
         [ classList [ ("line-through", completed) ] ]
         [ text description ]
+    , button
+        [ type_ "button"
+        , class "ml-1"
+        , Events.onClick (RemoveEntry uid)
+        ]
+        [ text "x" ]
     ]
