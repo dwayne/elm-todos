@@ -40,6 +40,7 @@ type Msg
   | AddEntry
   | RemoveEntry Int
   | ToggleEntry Int Bool
+  | ToggleEntries Bool
 
 update : Msg -> Model -> Model
 update msg model =
@@ -74,6 +75,13 @@ update msg model =
       in
         { model | entries = List.map updateEntry model.entries }
 
+    ToggleEntries completed ->
+      let
+        updateEntry entry =
+          { entry | completed = completed }
+      in
+        { model | entries = List.map updateEntry model.entries }
+
 createEntry : Int -> String -> Entry
 createEntry uid description =
   { uid = uid, description = description, completed = False }
@@ -92,6 +100,15 @@ view { description, entries } =
             , Events.onInput SetDescription
             ]
             []
+        ]
+    , label []
+        [ input
+           [ type_ "checkbox"
+           , checked (List.all .completed entries)
+           , Events.onCheck ToggleEntries
+           ]
+           []
+        , text "Mark all as completed"
         ]
     , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
     ]
