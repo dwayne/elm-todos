@@ -5,3 +5,11 @@
 .line-through {
   text-decoration: line-through;
 }
+
+.visible-on-hover {
+  visibility: hidden;
+}
+
+.hover-target:hover .visible-on-hover {
+  visibility: visible;
+}
