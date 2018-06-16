@@ -45,6 +45,7 @@ model =
 
 type Msg
   = SetDescription String
+  | SetVisible Visibility
   | AddEntry
   | RemoveEntry Int
   | ToggleEntry Int Bool
@@ -56,6 +57,9 @@ update msg model =
   case msg of
     SetDescription description ->
       { model | description = description }
+
+    SetVisible visible ->
+      { model | visible = visible }
 
     AddEntry ->
       let
@@ -140,6 +144,7 @@ viewBody visible entries =
               (\entry -> (toString entry.uid, li [] [ viewEntry entry ]))
               (keep visible entries)
       , viewNumIncompleteEntries entries
+      , viewVisibilityFilters visible
       , button
           [ type_ "button"
           , Events.onClick RemoveCompletedEntries
@@ -176,6 +181,23 @@ viewNumIncompleteEntries entries =
         |> List.length
   in
     div [] [ text <| toString n ++ " " ++ pluralize n "task" "tasks" ++ " left" ]
+
+viewVisibilityFilters : Visibility -> Html Msg
+viewVisibilityFilters selected =
+  div []
+    [ viewVisibilityFilter "All" "#/" All selected
+    , text " "
+    , viewVisibilityFilter "Active" "#/active" Active selected
+    , text " "
+    , viewVisibilityFilter "Completed" "#/completed" Completed selected
+    ]
+
+viewVisibilityFilter : String -> String -> Visibility -> Visibility -> Html Msg
+viewVisibilityFilter name url current selected =
+  if current == selected then
+    span [] [ text name ]
+  else
+    a [ href url, Events.onClick (SetVisible current) ] [ text name ]
 
 -- HELPERS
 
