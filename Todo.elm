@@ -17,8 +17,14 @@ main =
 type alias Model =
   { uid : Int
   , description : String
+  , visible : Visibility
   , entries : List Entry
   }
+
+type Visibility
+  = All
+  | Active
+  | Completed
 
 type alias Entry =
   { uid : Int
@@ -30,6 +36,7 @@ model : Model
 model =
   { uid = 0
   , description = ""
+  , visible = All
   , entries = []
   }
 
@@ -93,10 +100,10 @@ createEntry uid description =
 -- VIEW
 
 view : Model -> Html Msg
-view { description, entries } =
+view { description, visible, entries } =
   div []
     [ viewPrompt description
-    , viewBody entries
+    , viewBody visible entries
     ]
 
 viewPrompt : String -> Html Msg
@@ -112,8 +119,8 @@ viewPrompt description =
         []
     ]
 
-viewBody : List Entry -> Html Msg
-viewBody entries =
+viewBody : Visibility -> List Entry -> Html Msg
+viewBody visible entries =
   if List.isEmpty entries then
     text ""
   else
@@ -127,7 +134,7 @@ viewBody entries =
              []
           , text "Mark all as completed"
           ]
-      , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
+      , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) (keep visible entries))
       , viewNumIncompleteEntries entries
       , button
           [ type_ "button"
@@ -167,6 +174,18 @@ viewNumIncompleteEntries entries =
     div [] [ text <| toString n ++ " " ++ pluralize n "task" "tasks" ++ " left" ]
 
 -- HELPERS
+
+keep : Visibility -> List Entry -> List Entry
+keep visible entries =
+  case visible of
+    All ->
+      entries
+
+    Active ->
+      List.filter (not << .completed) entries
+
+    Completed ->
+      List.filter .completed entries
 
 pluralize : Int -> String -> String -> String
 pluralize n singular plural =
