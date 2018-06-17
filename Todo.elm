@@ -37,20 +37,17 @@ type alias Entry =
 
 init : Navigation.Location -> (Model, Cmd Msg)
 init location =
-  Debug.log (toString location) <|
-    { uid = 0
-    , description = ""
-    -- TODO: Set visible based on location.
-    , visible = All
-    , entries = []
-    } ! []
+  { uid = 0
+  , description = ""
+  , visible = toVisibility location
+  , entries = []
+  } ! []
 
 -- UPDATE
 
 type Msg
   = NewLocation Navigation.Location
   | SetDescription String
-  | SetVisible Visibility
   | AddEntry
   | RemoveEntry Int
   | ToggleEntry Int Bool
@@ -61,14 +58,10 @@ update : Msg -> Model -> Model
 update msg model =
   case msg of
     NewLocation location ->
-      -- TODO: Set visible based on location.
-      Debug.log (toString location) model
+      { model | visible = toVisibility location }
 
     SetDescription description ->
       { model | description = description }
-
-    SetVisible visible ->
-      { model | visible = visible }
 
     AddEntry ->
       let
@@ -206,7 +199,7 @@ viewVisibilityFilter name url current selected =
   if current == selected then
     span [] [ text name ]
   else
-    a [ href url, Events.onClick (SetVisible current) ] [ text name ]
+    a [ href url ] [ text name ]
 
 -- HELPERS
 
@@ -228,3 +221,15 @@ pluralize n singular plural =
     singular
   else
     plural
+
+toVisibility : Navigation.Location -> Visibility
+toVisibility { hash } =
+  case String.dropLeft 2 hash of
+    "active" ->
+      Active
+
+    "completed" ->
+      Completed
+
+    _ ->
+      All
