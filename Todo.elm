@@ -59,6 +59,7 @@ type Msg
   | AddEntry
   | RemoveEntry Int
   | ToggleEntry Int Bool
+  | CancelEdit
   | EditEntry Int String
   | Focus (Result Dom.Error ())
   | SaveEdit Int String
@@ -103,6 +104,9 @@ update msg model =
             entry
       in
         { model | entries = List.map updateEntry model.entries } ! []
+
+    CancelEdit ->
+      { model | mode = Normal } ! []
 
     EditEntry uid description ->
       { model | mode = Edit uid description } ! [ focus uid ]
@@ -244,6 +248,7 @@ viewEntryEdit uid description =
         , id (htmlId uid)
         , value description
         , Events.onInput (SetDescriptionForEntry uid)
+        , Events.onBlur CancelEdit
         ]
         []
     ]
