@@ -20,9 +20,14 @@ main =
 type alias Model =
   { uid : Int
   , description : String
+  , mode : Mode
   , visible : Visibility
   , entries : List Entry
   }
+
+type Mode
+  = Normal
+  | Edit Int String
 
 type Visibility
   = All
@@ -39,6 +44,7 @@ init : Navigation.Location -> (Model, Cmd Msg)
 init location =
   { uid = 0
   , description = ""
+  , mode = Normal
   , visible = toVisibility location
   , entries = []
   } ! []
@@ -51,6 +57,7 @@ type Msg
   | AddEntry
   | RemoveEntry Int
   | ToggleEntry Int Bool
+  | EditEntry Int String
   | RemoveCompletedEntries
   | ToggleEntries Bool
 
@@ -90,6 +97,9 @@ update msg model =
       in
         { model | entries = List.map updateEntry model.entries }
 
+    EditEntry uid description ->
+      { model | mode = Edit uid description }
+
     RemoveCompletedEntries ->
       { model | entries = List.filter (not << .completed) model.entries }
 
@@ -107,10 +117,10 @@ createEntry uid description =
 -- VIEW
 
 view : Model -> Html Msg
-view { description, visible, entries } =
+view { description, mode, visible, entries } =
   div []
     [ viewPrompt description
-    , viewBody visible entries
+    , viewBody mode visible entries
     ]
 
 viewPrompt : String -> Html Msg
@@ -126,8 +136,8 @@ viewPrompt description =
         []
     ]
 
-viewBody : Visibility -> List Entry -> Html Msg
-viewBody visible entries =
+viewBody : Mode -> Visibility -> List Entry -> Html Msg
+viewBody mode visible entries =
   if List.isEmpty entries then
     text ""
   else
@@ -143,7 +153,7 @@ viewBody visible entries =
           ]
       , Keyed.ul []
           <| List.map
-              (\entry -> (toString entry.uid, li [] [ viewEntry entry ]))
+              (\entry -> (toString entry.uid, li [] [ viewEntry mode entry ]))
               (keep visible entries)
       , viewNumIncompleteEntries entries
       , viewVisibilityFilters visible
@@ -154,8 +164,20 @@ viewBody visible entries =
           [ text "Clear completed" ]
       ]
 
-viewEntry : Entry -> Html Msg
-viewEntry { uid, description, completed } =
+viewEntry : Mode -> Entry -> Html Msg
+viewEntry mode entry =
+  case mode of
+    Normal ->
+      viewEntryNormal entry
+
+    Edit uid description ->
+      if uid == entry.uid then
+        viewEntryEdit description
+      else
+        viewEntryNormal entry
+
+viewEntryNormal : Entry -> Html Msg
+viewEntryNormal { uid, description, completed } =
   div [ class "hover-target" ]
     [ input
         [ type_ "checkbox"
@@ -164,7 +186,9 @@ viewEntry { uid, description, completed } =
         ]
         []
     , span
-        [ classList [ ("line-through", completed) ] ]
+        [ classList [ ("line-through", completed) ]
+        , Events.onDoubleClick (EditEntry uid description)
+        ]
         [ text description ]
     , button
         [ type_ "button"
@@ -172,6 +196,16 @@ viewEntry { uid, description, completed } =
         , Events.onClick (RemoveEntry uid)
         ]
         [ text "x" ]
+    ]
+
+viewEntryEdit : String -> Html msg
+viewEntryEdit description =
+  Html.form []
+    [ input
+        [ type_ "text"
+        , value description
+        ]
+        []
     ]
 
 viewNumIncompleteEntries : List Entry -> Html msg
