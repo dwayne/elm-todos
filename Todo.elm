@@ -61,6 +61,7 @@ type Msg
   | ToggleEntry Int Bool
   | EditEntry Int String
   | Focus (Result Dom.Error ())
+  | SaveEdit Int String
   | SetDescriptionForEntry Int String
   | RemoveCompletedEntries
   | ToggleEntries Bool
@@ -114,6 +115,25 @@ update msg model =
         Err (Dom.NotFound e) ->
           Debug.log ("Unable to focus the input field: " ++ e)
             { model | mode = Normal } ! []
+
+    SaveEdit uid description ->
+      let
+        cleanDescription =
+          String.trim description
+
+        updateEntry entry =
+          if entry.uid == uid then
+            { entry | description = cleanDescription }
+          else
+            entry
+      in
+        if String.isEmpty cleanDescription then
+          { model | mode = Normal } ! []
+        else
+          { model
+          | mode = Normal
+          , entries = List.map updateEntry model.entries
+          } ! []
 
     SetDescriptionForEntry uid description ->
       { model | mode = Edit uid description } ! []
@@ -218,7 +238,7 @@ viewEntryNormal { uid, description, completed } =
 
 viewEntryEdit : Int -> String -> Html Msg
 viewEntryEdit uid description =
-  Html.form []
+  Html.form [ Events.onSubmit (SaveEdit uid description) ]
     [ input
         [ type_ "text"
         , id (htmlId uid)
