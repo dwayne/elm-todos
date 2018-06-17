@@ -10,7 +10,7 @@ main : Program Never Model Msg
 main =
   Navigation.program NewLocation
     { init = init
-    , update = (\msg model -> update msg model ! [])
+    , update = update
     , view = view
     , subscriptions = always Sub.none
     }
@@ -61,14 +61,14 @@ type Msg
   | RemoveCompletedEntries
   | ToggleEntries Bool
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     NewLocation location ->
-      { model | visible = toVisibility location }
+      { model | visible = toVisibility location } ! []
 
     SetDescription description ->
-      { model | description = description }
+      { model | description = description } ! []
 
     AddEntry ->
       let
@@ -76,16 +76,18 @@ update msg model =
           String.trim model.description
       in
         if String.isEmpty cleanDescription then
-          model
+          model ! []
         else
           { model
           | uid = model.uid + 1
           , description = ""
           , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
-          }
+          } ! []
 
     RemoveEntry uid ->
-      { model | entries = List.filter (\entry -> entry.uid /= uid) model.entries }
+      { model
+      | entries = List.filter (\entry -> entry.uid /= uid) model.entries
+      } ! []
 
     ToggleEntry uid completed ->
       let
@@ -95,20 +97,20 @@ update msg model =
           else
             entry
       in
-        { model | entries = List.map updateEntry model.entries }
+        { model | entries = List.map updateEntry model.entries } ! []
 
     EditEntry uid description ->
-      { model | mode = Edit uid description }
+      { model | mode = Edit uid description } ! []
 
     RemoveCompletedEntries ->
-      { model | entries = List.filter (not << .completed) model.entries }
+      { model | entries = List.filter (not << .completed) model.entries } ! []
 
     ToggleEntries completed ->
       let
         updateEntry entry =
           { entry | completed = completed }
       in
-        { model | entries = List.map updateEntry model.entries }
+        { model | entries = List.map updateEntry model.entries } ! []
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
