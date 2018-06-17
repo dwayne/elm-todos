@@ -1,10 +1,12 @@
 module Todo exposing (main)
 
+import Dom
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as Events
 import Html.Keyed as Keyed
 import Navigation
+import Task
 
 main : Program Never Model Msg
 main =
@@ -58,6 +60,7 @@ type Msg
   | RemoveEntry Int
   | ToggleEntry Int Bool
   | EditEntry Int String
+  | Focus (Result Dom.Error ())
   | RemoveCompletedEntries
   | ToggleEntries Bool
 
@@ -100,7 +103,16 @@ update msg model =
         { model | entries = List.map updateEntry model.entries } ! []
 
     EditEntry uid description ->
-      { model | mode = Edit uid description } ! []
+      { model | mode = Edit uid description } ! [ focus uid ]
+
+    Focus result ->
+      case result of
+        Ok () ->
+          model ! []
+
+        Err (Dom.NotFound e) ->
+          Debug.log ("Unable to focus the input field: " ++ e)
+            { model | mode = Normal } ! []
 
     RemoveCompletedEntries ->
       { model | entries = List.filter (not << .completed) model.entries } ! []
@@ -174,7 +186,7 @@ viewEntry mode entry =
 
     Edit uid description ->
       if uid == entry.uid then
-        viewEntryEdit description
+        viewEntryEdit uid description
       else
         viewEntryNormal entry
 
@@ -200,11 +212,12 @@ viewEntryNormal { uid, description, completed } =
         [ text "x" ]
     ]
 
-viewEntryEdit : String -> Html msg
-viewEntryEdit description =
+viewEntryEdit : Int -> String -> Html msg
+viewEntryEdit uid description =
   Html.form []
     [ input
         [ type_ "text"
+        , id (htmlId uid)
         , value description
         ]
         []
@@ -238,6 +251,14 @@ viewVisibilityFilter name url current selected =
     a [ href url ] [ text name ]
 
 -- HELPERS
+
+focus : Int -> Cmd Msg
+focus uid =
+  Task.attempt Focus (Dom.focus (htmlId uid))
+
+htmlId : Int -> String
+htmlId uid =
+  "edit-entry-" ++ toString uid
 
 keep : Visibility -> List Entry -> List Entry
 keep visible entries =
