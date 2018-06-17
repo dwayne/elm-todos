@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as Events
 import Html.Keyed as Keyed
+import Json.Decode as Decode
 import Navigation
 import Task
 
@@ -249,6 +250,7 @@ viewEntryEdit uid description =
         , value description
         , Events.onInput (SetDescriptionForEntry uid)
         , Events.onBlur CancelEdit
+        , onEsc CancelEdit
         ]
         []
     ]
@@ -301,6 +303,19 @@ keep visible entries =
 
     Completed ->
       List.filter .completed entries
+
+onEsc : msg -> Attribute msg
+onEsc msg =
+  let
+    isEsc keyCode =
+      case keyCode of
+        27 ->
+          Decode.succeed msg
+
+        _ ->
+          Decode.fail "Not ESC"
+  in
+    Events.on "keydown" (Decode.andThen isEsc Events.keyCode)
 
 pluralize : Int -> String -> String -> String
 pluralize n singular plural =
