@@ -4,13 +4,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as Events
 import Html.Keyed as Keyed
+import Navigation
 
 main : Program Never Model Msg
 main =
-  Html.beginnerProgram
-    { model = model
-    , update = update
+  Navigation.program NewLocation
+    { init = init
+    , update = (\msg model -> update msg model ! [])
     , view = view
+    , subscriptions = always Sub.none
     }
 
 -- MODEL
@@ -33,18 +35,21 @@ type alias Entry =
   , completed : Bool
   }
 
-model : Model
-model =
-  { uid = 0
-  , description = ""
-  , visible = All
-  , entries = []
-  }
+init : Navigation.Location -> (Model, Cmd Msg)
+init location =
+  Debug.log (toString location) <|
+    { uid = 0
+    , description = ""
+    -- TODO: Set visible based on location.
+    , visible = All
+    , entries = []
+    } ! []
 
 -- UPDATE
 
 type Msg
-  = SetDescription String
+  = NewLocation Navigation.Location
+  | SetDescription String
   | SetVisible Visibility
   | AddEntry
   | RemoveEntry Int
@@ -55,6 +60,10 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
   case msg of
+    NewLocation location ->
+      -- TODO: Set visible based on location.
+      Debug.log (toString location) model
+
     SetDescription description ->
       { model | description = description }
 
