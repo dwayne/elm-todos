@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as Events
 import Html.Keyed as Keyed
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Navigation
 import Task
@@ -49,13 +49,29 @@ type alias Entry =
 
 init : Flags -> Navigation.Location -> (Model, Cmd Msg)
 init savedModel location =
-  Debug.log (toString savedModel)
-    { uid = 0
-    , description = ""
-    , mode = Normal
-    , visible = toVisibility location
-    , entries = []
-    } ! []
+  let
+    visible =
+      toVisibility location
+
+    initModel =
+      { uid = 0
+      , description = ""
+      , mode = Normal
+      , visible = visible
+      , entries = []
+      }
+  in
+    case savedModel of
+      Nothing ->
+        initModel ! []
+
+      Just value ->
+        case Decode.decodeValue modelDecoder value of
+          Ok model ->
+            { model | visible = visible } ! []
+
+          Err e ->
+            (Debug.log ("Unable to restore the saved model: " ++ e) initModel) ! []
 
 -- UPDATE
 
@@ -169,6 +185,61 @@ update msg model =
 createEntry : Int -> String -> Entry
 createEntry uid description =
   { uid = uid, description = description, completed = False }
+
+-- DECODERS
+
+modelDecoder : Decoder Model
+modelDecoder =
+  Decode.map5 Model
+    (Decode.field "uid" Decode.int)
+    (Decode.field "description" Decode.string)
+    (Decode.field "mode" modeDecoder)
+    (Decode.field "visible" visibilityDecoder)
+    (Decode.field "entries" (Decode.list entryDecoder))
+
+modeDecoder : Decoder Mode
+modeDecoder =
+  Decode.field "ctor" Decode.string
+    |> Decode.andThen
+        (\s ->
+          case s of
+            "Normal" ->
+              Decode.succeed Normal
+
+            "Edit" ->
+              Decode.map2 Edit
+                (Decode.field "0" Decode.int)
+                (Decode.field "1" Decode.string)
+
+            _ ->
+              Decode.fail ("Unknown data constructor for mode: " ++ s)
+        )
+
+visibilityDecoder : Decoder Visibility
+visibilityDecoder =
+  Decode.string
+    |> Decode.andThen
+        (\s ->
+          case s of
+            "all" ->
+              Decode.succeed All
+
+            "active" ->
+              Decode.succeed Active
+
+            "completed" ->
+              Decode.succeed Completed
+
+            _ ->
+              Decode.fail ("Unknown visibility: " ++ s)
+        )
+
+entryDecoder : Decoder Entry
+entryDecoder =
+  Decode.map3 Entry
+    (Decode.field "uid" Decode.int)
+    (Decode.field "description" Decode.string)
+    (Decode.field "completed" Decode.bool)
 
 -- ENCODERS
 
