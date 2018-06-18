@@ -10,9 +10,9 @@ import Json.Encode as Encode
 import Navigation
 import Task
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-  Navigation.program NewLocation
+  Navigation.programWithFlags NewLocation
     { init = init
     , update = updateAndSave
     , view = view
@@ -20,6 +20,9 @@ main =
     }
 
 -- MODEL
+
+type alias Flags =
+  Maybe Encode.Value
 
 type alias Model =
   { uid : Int
@@ -44,14 +47,15 @@ type alias Entry =
   , completed : Bool
   }
 
-init : Navigation.Location -> (Model, Cmd Msg)
-init location =
-  { uid = 0
-  , description = ""
-  , mode = Normal
-  , visible = toVisibility location
-  , entries = []
-  } ! []
+init : Flags -> Navigation.Location -> (Model, Cmd Msg)
+init savedModel location =
+  Debug.log (toString savedModel)
+    { uid = 0
+    , description = ""
+    , mode = Normal
+    , visible = toVisibility location
+    , entries = []
+    } ! []
 
 -- UPDATE
 
