@@ -1,4 +1,4 @@
-module Todo exposing (main)
+port module Todo exposing (main)
 
 import Dom
 import Html exposing (..)
@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events as Events
 import Html.Keyed as Keyed
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Navigation
 import Task
 
@@ -13,7 +14,7 @@ main : Program Never Model Msg
 main =
   Navigation.program NewLocation
     { init = init
-    , update = update
+    , update = updateAndSave
     , view = view
     , subscriptions = always Sub.none
     }
@@ -67,6 +68,14 @@ type Msg
   | SetDescriptionForEntry Int String
   | RemoveCompletedEntries
   | ToggleEntries Bool
+
+updateAndSave : Msg -> Model -> (Model, Cmd Msg)
+updateAndSave msg model =
+  let
+    (nextModel, cmd) =
+      update msg model
+  in
+    nextModel ! [ cmd, save (encodeModel nextModel) ]
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -156,6 +165,55 @@ update msg model =
 createEntry : Int -> String -> Entry
 createEntry uid description =
   { uid = uid, description = description, completed = False }
+
+-- ENCODERS
+
+encodeModel : Model -> Encode.Value
+encodeModel { uid, description, mode, visible, entries } =
+  Encode.object
+    [ ("uid", Encode.int uid)
+    , ("description", Encode.string description)
+    , ("mode", encodeMode mode)
+    , ("visible", encodeVisibility visible)
+    , ("entries", Encode.list (List.map encodeEntry entries))
+    ]
+
+encodeMode : Mode -> Encode.Value
+encodeMode mode =
+  case mode of
+    Normal ->
+      Encode.object [ ("ctor", Encode.string "Normal") ]
+
+    Edit uid description ->
+      Encode.object
+        [ ("ctor", Encode.string "Edit")
+        , ("0", Encode.int uid)
+        , ("1", Encode.string description)
+        ]
+
+encodeVisibility : Visibility -> Encode.Value
+encodeVisibility visible =
+  case visible of
+    All ->
+      Encode.string "all"
+
+    Active ->
+      Encode.string "active"
+
+    Completed ->
+      Encode.string "completed"
+
+encodeEntry : Entry -> Encode.Value
+encodeEntry { uid, description, completed } =
+  Encode.object
+    [ ("uid", Encode.int uid)
+    , ("description", Encode.string description)
+    , ("completed", Encode.bool completed)
+    ]
+
+-- PORTS
+
+port save : Encode.Value -> Cmd msg
 
 -- VIEW
 

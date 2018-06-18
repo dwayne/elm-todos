@@ -11,7 +11,12 @@
   <body>
     <script src="todo.js"></script>
     <script>
-      Elm.Todo.fullscreen();
+      var key = 'elm-todos-state';
+      var app = Elm.Todo.fullscreen();
+
+      app.ports.save.subscribe(function (modelToSave) {
+        localStorage.setItem(key, JSON.stringify(modelToSave));
+      });
     </script>
   </body>
 </html>
