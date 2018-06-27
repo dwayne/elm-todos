@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Elm Todos</title>
+
+    <link rel="stylesheet" href="todo.css">
+  </head>
+  <body>
+    <script src="todo.js"></script>
+    <script>
+      var key = 'elm-todos-state';
+      var state = localStorage.getItem(key);
+      var savedModel = state ? JSON.parse(state) : null;
+      var app = Elm.Todo.fullscreen(savedModel);
+
+      app.ports.save.subscribe(function (modelToSave) {
+        localStorage.setItem(key, JSON.stringify(modelToSave));
+      });
+    </script>
+  </body>
+</html>
