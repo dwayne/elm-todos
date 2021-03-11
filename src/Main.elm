@@ -90,5 +90,12 @@ view { description, entries } =
 
 
 viewEntry : Entry -> Html msg
-viewEntry { description } =
-  text description
+viewEntry { description, completed } =
+  div []
+    [ input
+        [ type_ "checkbox"
+        , checked completed
+        ]
+        []
+    , text description
+    ]
