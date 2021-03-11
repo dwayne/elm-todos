@@ -21,12 +21,13 @@ main =
 
 type alias Model =
   { description : String
+  , entries : List String
   }
 
 
 init : Model
 init =
-  Model ""
+  Model "" []
 
 
 -- UPDATE
