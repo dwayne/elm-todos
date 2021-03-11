@@ -34,6 +34,7 @@ init =
 
 type Msg
   = ChangedDescription String
+  | SubmittedDescription
 
 
 update : Msg -> Model -> Model
@@ -42,17 +43,29 @@ update msg model =
     ChangedDescription description ->
       { model | description = description }
 
+    SubmittedDescription ->
+      let
+        cleanDescription =
+          String.trim model.description
+      in
+      if String.isEmpty cleanDescription then
+        model
+      else
+        Debug.log cleanDescription { model | description = "" }
+
 
 -- VIEW
 
 
 view : Model -> Html Msg
 view { description } =
-  input
-    [ type_ "text"
-    , autofocus True
-    , placeholder "What needs to be done?"
-    , value description
-    , E.onInput ChangedDescription
+  Html.form [ E.onSubmit SubmittedDescription ]
+    [ input
+        [ type_ "text"
+        , autofocus True
+        , placeholder "What needs to be done?"
+        , value description
+        , E.onInput ChangedDescription
+        ]
+        []
     ]
-    []
