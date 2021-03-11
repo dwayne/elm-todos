@@ -62,14 +62,17 @@ update msg model =
 
 
 view : Model -> Html Msg
-view { description } =
-  Html.form [ E.onSubmit SubmittedDescription ]
-    [ input
-        [ type_ "text"
-        , autofocus True
-        , placeholder "What needs to be done?"
-        , value description
-        , E.onInput ChangedDescription
+view { description, entries } =
+  div []
+    [ Html.form [ E.onSubmit SubmittedDescription ]
+        [ input
+            [ type_ "text"
+            , autofocus True
+            , placeholder "What needs to be done?"
+            , value description
+            , E.onInput ChangedDescription
+            ]
+            []
         ]
-        []
+    , ul [] (List.map (\s -> li [] [ text s ]) entries)
     ]
