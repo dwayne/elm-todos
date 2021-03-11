@@ -20,20 +20,22 @@ main =
 
 
 type alias Model =
-  { description : String
+  { uid : Int
+  , description : String
   , entries : List Entry
   }
 
 
 type alias Entry =
-  { description : String
+  { uid : Int
+  , description : String
   , completed : Bool
   }
 
 
 init : Model
 init =
-  Model "" []
+  Model 0 "" []
 
 
 -- UPDATE
@@ -42,7 +44,7 @@ init =
 type Msg
   = ChangedDescription String
   | SubmittedDescription
-  | CheckedEntry Bool
+  | CheckedEntry Int Bool
 
 
 update : Msg -> Model -> Model
@@ -60,17 +62,25 @@ update msg model =
         model
       else
         { model
-        | description = ""
-        , entries = model.entries ++ [ createEntry cleanDescription ]
+        | uid = model.uid + 1
+        , description = ""
+        , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
         }
 
-    CheckedEntry isChecked ->
-      Debug.log "Hmm. Which entry to update?" model
+    CheckedEntry uid isChecked ->
+      let
+        updateEntry entry =
+          if uid == entry.uid then
+            { entry | completed = isChecked }
+          else
+            entry
+      in
+      { model | entries = List.map updateEntry model.entries }
 
 
-createEntry : String -> Entry
-createEntry description =
-  Entry description False
+createEntry : Int -> String -> Entry
+createEntry uid description =
+  Entry uid description False
 
 
 -- VIEW
@@ -94,12 +104,12 @@ view { description, entries } =
 
 
 viewEntry : Entry -> Html Msg
-viewEntry { description, completed } =
+viewEntry { uid, description, completed } =
   div []
     [ input
         [ type_ "checkbox"
         , checked completed
-        , E.onCheck CheckedEntry
+        , E.onCheck (CheckedEntry uid)
         ]
         []
     , text description
