@@ -112,5 +112,7 @@ viewEntry { uid, description, completed } =
         , E.onCheck (CheckedEntry uid)
         ]
         []
-    , text description
+    , span
+        [ classList [ ("line-through", completed) ] ]
+        [ text description ]
     ]
