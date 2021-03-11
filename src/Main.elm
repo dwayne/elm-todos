@@ -42,6 +42,7 @@ init =
 type Msg
   = ChangedDescription String
   | SubmittedDescription
+  | CheckedEntry Bool
 
 
 update : Msg -> Model -> Model
@@ -62,6 +63,9 @@ update msg model =
         | description = ""
         , entries = model.entries ++ [ createEntry cleanDescription ]
         }
+
+    CheckedEntry isChecked ->
+      Debug.log "Hmm. Which entry to update?" model
 
 
 createEntry : String -> Entry
@@ -89,12 +93,13 @@ view { description, entries } =
     ]
 
 
-viewEntry : Entry -> Html msg
+viewEntry : Entry -> Html Msg
 viewEntry { description, completed } =
   div []
     [ input
         [ type_ "checkbox"
         , checked completed
+        , E.onCheck CheckedEntry
         ]
         []
     , text description
