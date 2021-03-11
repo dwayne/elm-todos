@@ -52,7 +52,10 @@ update msg model =
       if String.isEmpty cleanDescription then
         model
       else
-        Debug.log cleanDescription { model | description = "" }
+        { model
+        | description = ""
+        , entries = model.entries ++ [ cleanDescription ]
+        }
 
 
 -- VIEW
