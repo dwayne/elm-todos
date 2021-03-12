@@ -46,6 +46,7 @@ type Msg
   | SubmittedDescription
   | CheckedEntry Int Bool
   | ClickedRemoveButton Int
+  | CheckedMarkAllCompleted Bool
 
 
 update : Msg -> Model -> Model
@@ -83,6 +84,13 @@ update msg model =
       | entries = List.filter (\entry -> entry.uid /= uid) model.entries
       }
 
+    CheckedMarkAllCompleted isChecked ->
+      let
+        updateEntry entry =
+          { entry | completed = isChecked }
+      in
+      { model | entries = List.map updateEntry model.entries }
+
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
@@ -104,6 +112,15 @@ view { description, entries } =
             , E.onInput ChangedDescription
             ]
             []
+        ]
+    , label []
+        [ input
+            [ type_ "checkbox"
+            , checked (List.all .completed entries)
+            , E.onCheck CheckedMarkAllCompleted
+            ]
+            []
+        , text "Mark all as completed"
         ]
     , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
     ]
