@@ -111,7 +111,7 @@ view { description, entries } =
 
 viewEntry : Entry -> Html Msg
 viewEntry { uid, description, completed } =
-  div []
+  div [ class "hover-target" ]
     [ input
         [ type_ "checkbox"
         , checked completed
@@ -123,7 +123,7 @@ viewEntry { uid, description, completed } =
         [ text description ]
     , button
         [ type_ "button"
-        , class "ml-1"
+        , class "ml-1 visible-on-hover"
         , E.onClick (ClickedRemoveButton uid)
         ]
         [ text "x" ]
