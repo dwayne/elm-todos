@@ -45,6 +45,7 @@ type Msg
   = ChangedDescription String
   | SubmittedDescription
   | CheckedEntry Int Bool
+  | ClickedRemoveButton Int
 
 
 update : Msg -> Model -> Model
@@ -76,6 +77,11 @@ update msg model =
             entry
       in
       { model | entries = List.map updateEntry model.entries }
+
+    ClickedRemoveButton uid ->
+      { model
+      | entries = List.filter (\entry -> entry.uid /= uid) model.entries
+      }
 
 
 createEntry : Int -> String -> Entry
@@ -115,4 +121,10 @@ viewEntry { uid, description, completed } =
     , span
         [ classList [ ("line-through", completed) ] ]
         [ text description ]
+    , button
+        [ type_ "button"
+        , class "ml-1"
+        , E.onClick (ClickedRemoveButton uid)
+        ]
+        [ text "x" ]
     ]
