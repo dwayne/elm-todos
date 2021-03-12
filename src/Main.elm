@@ -127,6 +127,7 @@ view { description, entries } =
         , text "Mark all as completed"
         ]
     , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
+    , viewStatus entries
     , button
         [ type_ "button"
         , E.onClick ClickedRemoveCompletedEntriesButton
@@ -154,3 +155,26 @@ viewEntry { uid, description, completed } =
         ]
         [ text "x" ]
     ]
+
+
+viewStatus : List Entry -> Html msg
+viewStatus entries =
+  let
+    n =
+      entries
+        |> List.filter (not << .completed)
+        |> List.length
+  in
+  div []
+    [ text <| String.fromInt n ++ " " ++ pluralize n "task" "tasks" ++ " left" ]
+
+
+-- HELPERS
+
+
+pluralize : Int -> String -> String -> String
+pluralize n singular plural =
+  if n == 1 then
+    singular
+  else
+    plural
