@@ -47,6 +47,7 @@ type Msg
   | CheckedEntry Int Bool
   | ClickedRemoveButton Int
   | CheckedMarkAllCompleted Bool
+  | ClickedRemoveCompletedEntriesButton
 
 
 update : Msg -> Model -> Model
@@ -91,6 +92,9 @@ update msg model =
       in
       { model | entries = List.map updateEntry model.entries }
 
+    ClickedRemoveCompletedEntriesButton ->
+      { model | entries = List.filter (not << .completed) model.entries }
+
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
@@ -123,6 +127,11 @@ view { description, entries } =
         , text "Mark all as completed"
         ]
     , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
+    , button
+        [ type_ "button"
+        , E.onClick ClickedRemoveCompletedEntriesButton
+        ]
+        [ text "Clear completed" ]
     ]
 
 
