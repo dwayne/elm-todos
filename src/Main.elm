@@ -22,6 +22,7 @@ main =
 type alias Model =
   { uid : Int
   , description : String
+  , visible : Visibility
   , entries : List Entry
   }
 
@@ -33,9 +34,15 @@ type alias Entry =
   }
 
 
+type Visibility
+  = All
+  | Active
+  | Completed
+
+
 init : Model
 init =
-  Model 0 "" []
+  Model 0 "" All []
 
 
 -- UPDATE
@@ -105,10 +112,10 @@ createEntry uid description =
 
 
 view : Model -> Html Msg
-view { description, entries } =
+view { description, visible, entries } =
   div []
     [ viewPrompt description
-    , viewBody entries
+    , viewBody visible entries
     ]
 
 
@@ -126,8 +133,8 @@ viewPrompt description =
     ]
 
 
-viewBody : List Entry -> Html Msg
-viewBody entries =
+viewBody : Visibility -> List Entry -> Html Msg
+viewBody visible entries =
   if List.isEmpty entries then
     text ""
   else
@@ -141,7 +148,8 @@ viewBody entries =
               []
           , text "Mark all as completed"
           ]
-      , ul [] (List.map (\entry -> li [] [ viewEntry entry ]) entries)
+      , ul [] <|
+          List.map (\entry -> li [] [ viewEntry entry ]) (keep visible entries)
       , viewStatus entries
       , button
           [ type_ "button"
@@ -185,6 +193,19 @@ viewStatus entries =
 
 
 -- HELPERS
+
+
+keep : Visibility -> List Entry -> List Entry
+keep visible entries =
+  case visible of
+    All ->
+      entries
+
+    Active ->
+      List.filter (not << .completed) entries
+
+    Completed ->
+      List.filter .completed entries
 
 
 pluralize : Int -> String -> String -> String
