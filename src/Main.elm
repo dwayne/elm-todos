@@ -49,9 +49,22 @@ type Visibility
 
 init : flags -> Url -> Nav.Key -> (Model, Cmd msg)
 init _ url key =
-  ( Model url key 0 "" All []
+  ( Model url key 0 "" (toVisibility url) []
   , Cmd.none
   )
+
+
+toVisibility : Url -> Visibility
+toVisibility url =
+  case (url.path, url.fragment) of
+    ("/", Just "/active") ->
+      Active
+
+    ("/", Just "/completed") ->
+      Completed
+
+    _ ->
+      All
 
 
 -- UPDATE
@@ -66,7 +79,6 @@ type Msg
   | ClickedRemoveButton Int
   | CheckedMarkAllCompleted Bool
   | ClickedRemoveCompletedEntriesButton
-  | ClickedVisibilityFilter Visibility
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -85,7 +97,7 @@ update msg model =
           )
 
     ChangedUrl url ->
-      ( Debug.log (Url.toString url) model
+      ( { model | visible = toVisibility url }
       , Cmd.none
       )
 
@@ -142,11 +154,6 @@ update msg model =
 
     ClickedRemoveCompletedEntriesButton ->
       ( { model | entries = List.filter (not << .completed) model.entries }
-      , Cmd.none
-      )
-
-    ClickedVisibilityFilter visible ->
-      ( { model | visible = visible }
       , Cmd.none
       )
 
@@ -261,7 +268,7 @@ viewVisibilityFilter name url current selected =
   if current == selected then
     span [] [ text name ]
   else
-    a [ href url, E.onClick (ClickedVisibilityFilter current) ] [ text name ]
+    a [ href url ] [ text name ]
 
 
 -- HELPERS
