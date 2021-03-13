@@ -55,6 +55,7 @@ type Msg
   | ClickedRemoveButton Int
   | CheckedMarkAllCompleted Bool
   | ClickedRemoveCompletedEntriesButton
+  | ClickedVisibilityFilter Visibility
 
 
 update : Msg -> Model -> Model
@@ -101,6 +102,9 @@ update msg model =
 
     ClickedRemoveCompletedEntriesButton ->
       { model | entries = List.filter (not << .completed) model.entries }
+
+    ClickedVisibilityFilter visible ->
+      { model | visible = visible }
 
 
 createEntry : Int -> String -> Entry
@@ -151,6 +155,7 @@ viewBody visible entries =
       , ul [] <|
           List.map (\entry -> li [] [ viewEntry entry ]) (keep visible entries)
       , viewStatus entries
+      , viewVisibilityFilters visible
       , button
           [ type_ "button"
           , E.onClick ClickedRemoveCompletedEntriesButton
@@ -190,6 +195,25 @@ viewStatus entries =
   in
   div []
     [ text <| String.fromInt n ++ " " ++ pluralize n "task" "tasks" ++ " left" ]
+
+
+viewVisibilityFilters : Visibility -> Html Msg
+viewVisibilityFilters selected =
+  div []
+    [ viewVisibilityFilter "All" "#/" All selected
+    , text " "
+    , viewVisibilityFilter "Active" "#/active" Active selected
+    , text " "
+    , viewVisibilityFilter "Completed" "#/completed" Completed selected
+    ]
+
+
+viewVisibilityFilter : String -> String -> Visibility -> Visibility -> Html Msg
+viewVisibilityFilter name url current selected =
+  if current == selected then
+    span [] [ text name ]
+  else
+    a [ href url, E.onClick (ClickedVisibilityFilter current) ] [ text name ]
 
 
 -- HELPERS
