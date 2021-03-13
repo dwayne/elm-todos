@@ -2,17 +2,22 @@ module Main exposing (main)
 
 
 import Browser
+import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as E
+import Url exposing (Url)
 
 
 main : Program () Model Msg
 main =
-  Browser.sandbox
+  Browser.application
     { init = init
     , update = update
     , view = view
+    , subscriptions = always Sub.none
+    , onUrlRequest = ClickedLink
+    , onUrlChange = ChangedUrl
     }
 
 
@@ -20,7 +25,9 @@ main =
 
 
 type alias Model =
-  { uid : Int
+  { url : Url
+  , key : Nav.Key
+  , uid : Int
   , description : String
   , visible : Visibility
   , entries : List Entry
@@ -40,16 +47,20 @@ type Visibility
   | Completed
 
 
-init : Model
-init =
-  Model 0 "" All []
+init : flags -> Url -> Nav.Key -> (Model, Cmd msg)
+init _ url key =
+  ( Model url key 0 "" All []
+  , Cmd.none
+  )
 
 
 -- UPDATE
 
 
 type Msg
-  = ChangedDescription String
+  = ClickedLink Browser.UrlRequest
+  | ChangedUrl Url
+  | ChangedDescription String
   | SubmittedDescription
   | CheckedEntry Int Bool
   | ClickedRemoveButton Int
@@ -58,11 +69,30 @@ type Msg
   | ClickedVisibilityFilter Visibility
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    ClickedLink urlRequest ->
+      case urlRequest of
+        Browser.Internal url ->
+          ( model
+          , Nav.pushUrl model.key (Url.toString url)
+          )
+
+        Browser.External href ->
+          ( model
+          , Nav.load href
+          )
+
+    ChangedUrl url ->
+      ( Debug.log (Url.toString url) model
+      , Cmd.none
+      )
+
     ChangedDescription description ->
-      { model | description = description }
+      ( { model | description = description }
+      , Cmd.none
+      )
 
     SubmittedDescription ->
       let
@@ -70,13 +100,17 @@ update msg model =
           String.trim model.description
       in
       if String.isEmpty cleanDescription then
-        model
+        ( model
+        , Cmd.none
+        )
       else
-        { model
-        | uid = model.uid + 1
-        , description = ""
-        , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
-        }
+        ( { model
+          | uid = model.uid + 1
+          , description = ""
+          , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
+          }
+        , Cmd.none
+        )
 
     CheckedEntry uid isChecked ->
       let
@@ -86,25 +120,35 @@ update msg model =
           else
             entry
       in
-      { model | entries = List.map updateEntry model.entries }
+      ( { model | entries = List.map updateEntry model.entries }
+      , Cmd.none
+      )
 
     ClickedRemoveButton uid ->
-      { model
-      | entries = List.filter (\entry -> entry.uid /= uid) model.entries
-      }
+      ( { model
+        | entries = List.filter (\entry -> entry.uid /= uid) model.entries
+        }
+      , Cmd.none
+      )
 
     CheckedMarkAllCompleted isChecked ->
       let
         updateEntry entry =
           { entry | completed = isChecked }
       in
-      { model | entries = List.map updateEntry model.entries }
+      ( { model | entries = List.map updateEntry model.entries }
+      , Cmd.none
+      )
 
     ClickedRemoveCompletedEntriesButton ->
-      { model | entries = List.filter (not << .completed) model.entries }
+      ( { model | entries = List.filter (not << .completed) model.entries }
+      , Cmd.none
+      )
 
     ClickedVisibilityFilter visible ->
-      { model | visible = visible }
+      ( { model | visible = visible }
+      , Cmd.none
+      )
 
 
 createEntry : Int -> String -> Entry
@@ -115,12 +159,16 @@ createEntry uid description =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view { description, visible, entries } =
-  div []
-    [ viewPrompt description
-    , viewBody visible entries
-    ]
+  { title = "Elm Todos"
+  , body =
+      [ div []
+          [ viewPrompt description
+          , viewBody visible entries
+          ]
+      ]
+  }
 
 
 viewPrompt : String -> Html Msg
