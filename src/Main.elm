@@ -29,9 +29,15 @@ type alias Model =
   , key : Nav.Key
   , uid : Int
   , description : String
+  , mode : Mode
   , visible : Visibility
   , entries : List Entry
   }
+
+
+type Mode
+  = Normal
+  | Edit Int String
 
 
 type alias Entry =
@@ -49,7 +55,7 @@ type Visibility
 
 init : flags -> Url -> Nav.Key -> (Model, Cmd msg)
 init _ url key =
-  ( Model url key 0 "" (toVisibility url) []
+  ( Model url key 0 "" Normal (toVisibility url) []
   , Cmd.none
   )
 
@@ -79,6 +85,7 @@ type Msg
   | ClickedRemoveButton Int
   | CheckedMarkAllCompleted Bool
   | ClickedRemoveCompletedEntriesButton
+  | DoubleClickedDescription Int String
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -157,6 +164,11 @@ update msg model =
       , Cmd.none
       )
 
+    DoubleClickedDescription uid description ->
+      ( { model | mode = Edit uid description }
+      , Cmd.none
+      )
+
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
@@ -167,12 +179,12 @@ createEntry uid description =
 
 
 view : Model -> Browser.Document Msg
-view { description, visible, entries } =
+view { description, mode, visible, entries } =
   { title = "Elm Todos"
   , body =
       [ div []
           [ viewPrompt description
-          , viewBody visible entries
+          , viewBody mode visible entries
           ]
       ]
   }
@@ -192,8 +204,8 @@ viewPrompt description =
     ]
 
 
-viewBody : Visibility -> List Entry -> Html Msg
-viewBody visible entries =
+viewBody : Mode -> Visibility -> List Entry -> Html Msg
+viewBody mode visible entries =
   if List.isEmpty entries then
     text ""
   else
@@ -208,7 +220,9 @@ viewBody visible entries =
           , text "Mark all as completed"
           ]
       , ul [] <|
-          List.map (\entry -> li [] [ viewEntry entry ]) (keep visible entries)
+          List.map
+            (\entry -> li [] [ viewEntry mode entry ])
+            (keep visible entries)
       , viewStatus entries
       , viewVisibilityFilters visible
       , button
@@ -219,8 +233,21 @@ viewBody visible entries =
       ]
 
 
-viewEntry : Entry -> Html Msg
-viewEntry { uid, description, completed } =
+viewEntry : Mode -> Entry -> Html Msg
+viewEntry mode entry =
+  case mode of
+    Normal ->
+      viewEntryNormal entry
+
+    Edit uid description ->
+      if uid == entry.uid then
+        viewEntryEdit description
+      else
+        viewEntryNormal entry
+
+
+viewEntryNormal : Entry -> Html Msg
+viewEntryNormal { uid, description, completed } =
   div [ class "hover-target" ]
     [ input
         [ type_ "checkbox"
@@ -229,7 +256,9 @@ viewEntry { uid, description, completed } =
         ]
         []
     , span
-        [ classList [ ("line-through", completed) ] ]
+        [ classList [ ("line-through", completed) ]
+        , E.onDoubleClick (DoubleClickedDescription uid description)
+        ]
         [ text description ]
     , button
         [ type_ "button"
@@ -237,6 +266,17 @@ viewEntry { uid, description, completed } =
         , E.onClick (ClickedRemoveButton uid)
         ]
         [ text "x" ]
+    ]
+
+
+viewEntryEdit : String -> Html Msg
+viewEntryEdit description =
+  Html.form []
+    [ input
+        [ type_ "text"
+        , value description
+        ]
+        []
     ]
 
 
