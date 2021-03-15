@@ -7,6 +7,7 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as E
+import Json.Decode as Decode
 import Task
 import Url exposing (Url)
 
@@ -92,6 +93,7 @@ type Msg
   | ChangedEntryDescription Int String
   | SubmittedEditedDescription
   | BlurredEntry
+  | EscapedEntry
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -227,6 +229,11 @@ update msg model =
       , Cmd.none
       )
 
+    EscapedEntry ->
+      ( { model | mode = Normal }
+      , Cmd.none
+      )
+
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
@@ -341,6 +348,7 @@ viewEntryEdit uid description =
         , value description
         , E.onInput (ChangedEntryDescription uid)
         , E.onBlur BlurredEntry
+        , onEsc EscapedEntry
         ]
         []
     ]
@@ -404,3 +412,17 @@ pluralize n singular plural =
     singular
   else
     plural
+
+
+onEsc : msg -> Attribute msg
+onEsc msg =
+  let
+    isEsc keyCode =
+      case keyCode of
+        27 ->
+          Decode.succeed msg
+
+        _ ->
+          Decode.fail "Not ESC"
+  in
+  E.on "keydown" (Decode.andThen isEsc E.keyCode)
