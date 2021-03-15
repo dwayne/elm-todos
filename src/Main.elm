@@ -90,6 +90,7 @@ type Msg
   | DoubleClickedDescription Int String
   | Focus (Result Dom.Error ())
   | ChangedEntryDescription Int String
+  | SubmittedEditedDescription
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -189,6 +190,36 @@ update msg model =
       ( { model | mode = Edit uid description }
       , Cmd.none
       )
+
+    SubmittedEditedDescription ->
+      case model.mode of
+        Normal ->
+          ( model
+          , Cmd.none
+          )
+
+        Edit uid description ->
+          let
+            cleanDescription =
+              String.trim description
+
+            updateEntry entry =
+              if uid == entry.uid then
+                { entry | description = cleanDescription }
+              else
+                entry
+          in
+          if String.isEmpty cleanDescription then
+            ( { model | mode = Normal }
+            , Cmd.none
+            )
+          else
+            ( { model
+              | mode = Normal
+              , entries = List.map updateEntry model.entries
+              }
+            , Cmd.none
+            )
 
 
 createEntry : Int -> String -> Entry
@@ -297,7 +328,7 @@ viewEntryNormal { uid, description, completed } =
 
 viewEntryEdit : Int -> String -> Html Msg
 viewEntryEdit uid description =
-  Html.form []
+  Html.form [ E.onSubmit SubmittedEditedDescription ]
     [ input
         [ type_ "text"
         , id (entryEditId uid)
