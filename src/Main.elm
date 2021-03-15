@@ -89,6 +89,7 @@ type Msg
   | ClickedRemoveCompletedEntriesButton
   | DoubleClickedDescription Int String
   | Focus (Result Dom.Error ())
+  | ChangedEntryDescription Int String
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -183,6 +184,11 @@ update msg model =
         ( model
         , Cmd.none
         )
+
+    ChangedEntryDescription uid description ->
+      ( { model | mode = Edit uid description }
+      , Cmd.none
+      )
 
 
 createEntry : Int -> String -> Entry
@@ -296,6 +302,7 @@ viewEntryEdit uid description =
         [ type_ "text"
         , id (entryEditId uid)
         , value description
+        , E.onInput (ChangedEntryDescription uid)
         ]
         []
     ]
