@@ -2,10 +2,12 @@ module Main exposing (main)
 
 
 import Browser
+import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as E
+import Task
 import Url exposing (Url)
 
 
@@ -86,6 +88,7 @@ type Msg
   | CheckedMarkAllCompleted Bool
   | ClickedRemoveCompletedEntriesButton
   | DoubleClickedDescription Int String
+  | Focus (Result Dom.Error ())
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -166,13 +169,30 @@ update msg model =
 
     DoubleClickedDescription uid description ->
       ( { model | mode = Edit uid description }
+      , focus (entryEditId uid)
+      )
+
+    Focus (Ok ()) ->
+      ( model
       , Cmd.none
       )
+
+    Focus (Err (Dom.NotFound e)) ->
+      Debug.log
+        ("The element to focus was not found: " ++ e)
+        ( model
+        , Cmd.none
+        )
 
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
   Entry uid description False
+
+
+focus : String -> Cmd Msg
+focus htmlId =
+  Task.attempt Focus (Dom.focus htmlId)
 
 
 -- VIEW
@@ -241,7 +261,7 @@ viewEntry mode entry =
 
     Edit uid description ->
       if uid == entry.uid then
-        viewEntryEdit description
+        viewEntryEdit uid description
       else
         viewEntryNormal entry
 
@@ -269,11 +289,12 @@ viewEntryNormal { uid, description, completed } =
     ]
 
 
-viewEntryEdit : String -> Html Msg
-viewEntryEdit description =
+viewEntryEdit : Int -> String -> Html Msg
+viewEntryEdit uid description =
   Html.form []
     [ input
         [ type_ "text"
+        , id (entryEditId uid)
         , value description
         ]
         []
@@ -312,6 +333,11 @@ viewVisibilityFilter name url current selected =
 
 
 -- HELPERS
+
+
+entryEditId : Int -> String
+entryEditId uid =
+  "entry-edit-" ++ String.fromInt uid
 
 
 keep : Visibility -> List Entry -> List Entry
