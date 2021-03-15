@@ -91,6 +91,7 @@ type Msg
   | Focus (Result Dom.Error ())
   | ChangedEntryDescription Int String
   | SubmittedEditedDescription
+  | BlurredEntry
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -221,6 +222,11 @@ update msg model =
             , Cmd.none
             )
 
+    BlurredEntry ->
+      ( { model | mode = Normal }
+      , Cmd.none
+      )
+
 
 createEntry : Int -> String -> Entry
 createEntry uid description =
@@ -334,6 +340,7 @@ viewEntryEdit uid description =
         , id (entryEditId uid)
         , value description
         , E.onInput (ChangedEntryDescription uid)
+        , E.onBlur BlurredEntry
         ]
         []
     ]
