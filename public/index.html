@@ -12,8 +12,13 @@
     <div id="app"></div>
     <script src="/app.js"></script>
     <script>
-      Elm.Main.init({
+      const key = 'elm-todos-state';
+      const app = Elm.Main.init({
         node: document.getElementById("app")
+      });
+
+      app.ports.save.subscribe(function (modelToSave) {
+        localStorage.setItem(key, JSON.stringify(modelToSave));
       });
     </script>
   </body>
