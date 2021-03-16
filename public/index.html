@@ -13,8 +13,11 @@
     <script src="/app.js"></script>
     <script>
       const key = 'elm-todos-state';
+      const state = localStorage.getItem(key);
+      const savedModel = state ? JSON.parse(state) : null;
       const app = Elm.Main.init({
-        node: document.getElementById("app")
+        node: document.getElementById("app"),
+        flags: savedModel
       });
 
       app.ports.save.subscribe(function (modelToSave) {

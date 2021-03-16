@@ -7,13 +7,13 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events as E
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Task
 import Url exposing (Url)
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
   Browser.application
     { init = init
@@ -57,9 +57,29 @@ type Visibility
   | Completed
 
 
-init : flags -> Url -> Nav.Key -> (Model, Cmd msg)
-init _ url key =
-  ( Model url key 0 "" Normal (toVisibility url) []
+type alias Flags =
+  Maybe Encode.Value
+
+
+init : Flags -> Url -> Nav.Key -> (Model, Cmd msg)
+init savedState url key =
+  let
+    initModel =
+      Model url key 0 "" Normal (toVisibility url) []
+  in
+  ( case savedState of
+      Nothing ->
+        initModel
+
+      Just value ->
+        case Decode.decodeValue (modelDecoder url key) value of
+          Ok model ->
+            model
+
+          Err e ->
+            Debug.log
+              ("Unable to restore the saved state: " ++ Decode.errorToString e)
+              initModel
   , Cmd.none
   )
 
@@ -311,6 +331,48 @@ encodeEntry { uid, description, completed } =
     , ("description", Encode.string description)
     , ("completed", Encode.bool completed)
     ]
+
+
+-- DECODERS
+
+
+modelDecoder : Url -> Nav.Key -> Decoder Model
+modelDecoder url key =
+  Decode.map7 Model
+    (Decode.succeed url)
+    (Decode.succeed key)
+    (Decode.field "uid" Decode.int)
+    (Decode.field "description" Decode.string)
+    (Decode.field "mode" modeDecoder)
+    (Decode.succeed (toVisibility url))
+    (Decode.field "entries" (Decode.list entryDecoder))
+
+
+modeDecoder : Decoder Mode
+modeDecoder =
+  Decode.field "ctor" Decode.string
+    |> Decode.andThen
+        (\s ->
+          case s of
+            "Normal" ->
+              Decode.succeed Normal
+
+            "Edit" ->
+              Decode.map2 Edit
+                (Decode.field "0" Decode.int)
+                (Decode.field "1" Decode.string)
+
+            _ ->
+              Decode.fail ("Unknown mode: " ++ s)
+        )
+
+
+entryDecoder : Decoder Entry
+entryDecoder =
+  Decode.map3 Entry
+    (Decode.field "uid" Decode.int)
+    (Decode.field "description" Decode.string)
+    (Decode.field "completed" Decode.bool)
 
 
 -- VIEW
