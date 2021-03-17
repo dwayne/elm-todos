@@ -382,55 +382,65 @@ view : Model -> Browser.Document Msg
 view { description, mode, visible, entries } =
   { title = "Elm Todos"
   , body =
-      [ div []
+      [ section [ class "todoapp" ] <|
           [ viewPrompt description
-          , viewBody mode visible entries
-          ]
+          ] ++ viewMain mode visible entries
+      , viewFooter
       ]
   }
 
 
 viewPrompt : String -> Html Msg
 viewPrompt description =
-  Html.form [ E.onSubmit SubmittedDescription ]
-    [ input
-        [ type_ "text"
-        , autofocus True
-        , placeholder "What needs to be done?"
-        , value description
-        , E.onInput ChangedDescription
+  header [ class "header" ]
+    [ h1 [] [ text "todos" ]
+    , Html.form [ E.onSubmit SubmittedDescription ]
+        [ input
+            [ type_ "text"
+            , autofocus True
+            , placeholder "What needs to be done?"
+            , class "new-todo"
+            , value description
+            , E.onInput ChangedDescription
+            ]
+            []
         ]
-        []
     ]
 
 
-viewBody : Mode -> Visibility -> List Entry -> Html Msg
-viewBody mode visible entries =
+viewMain : Mode -> Visibility -> List Entry -> List (Html Msg)
+viewMain mode visible entries =
   if List.isEmpty entries then
-    text ""
+    []
   else
-    div []
-      [ label []
-          [ input
-              [ type_ "checkbox"
-              , checked (List.all .completed entries)
-              , E.onCheck CheckedMarkAllCompleted
-              ]
-              []
-          , text "Mark all as completed"
-          ]
-      , ul [] <|
-          List.map
-            (\entry -> li [] [ viewEntry mode entry ])
-            (keep visible entries)
-      , viewStatus entries
-      , viewVisibilityFilters visible
-      , button
-          [ type_ "button"
-          , E.onClick ClickedRemoveCompletedEntriesButton
-          ]
-          [ text "Clear completed" ]
-      ]
+    [ section [ class "main" ]
+        [ input
+            [ type_ "checkbox"
+            , id "toggle-all"
+            , class "toggle-all"
+            , checked (List.all .completed entries)
+            , E.onCheck CheckedMarkAllCompleted
+            ]
+            []
+        , label [ for "toggle-all" ] [ text "Mark all as completed" ]
+        , ul [ class "todo-list" ] <|
+            List.map
+              (\entry ->
+                li
+                  [ classList
+                      [ ("completed", entry.completed)
+                      , ("editing", isEditing mode entry)
+                      ]
+                  ]
+                  [ viewEntry mode entry ]
+              )
+              (keep visible entries)
+        ]
+    , footer [ class "footer" ] <|
+        [ viewStatus entries
+        , viewVisibilityFilters visible
+        ] ++ viewClearCompleted entries
+    ]
 
 
 viewEntry : Mode -> Entry -> Html Msg
@@ -448,24 +458,22 @@ viewEntry mode entry =
 
 viewEntryNormal : Entry -> Html Msg
 viewEntryNormal { uid, description, completed } =
-  div [ class "hover-target" ]
+  div [ class "view" ]
     [ input
         [ type_ "checkbox"
         , checked completed
+        , class "toggle"
         , E.onCheck (CheckedEntry uid)
         ]
         []
-    , span
-        [ classList [ ("line-through", completed) ]
-        , E.onDoubleClick (DoubleClickedDescription uid description)
-        ]
+    , label [ E.onDoubleClick (DoubleClickedDescription uid description) ]
         [ text description ]
     , button
         [ type_ "button"
-        , class "ml-1 visible-on-hover"
+        , class "destroy"
         , E.onClick (ClickedRemoveButton uid)
         ]
-        [ text "x" ]
+        []
     ]
 
 
@@ -476,6 +484,7 @@ viewEntryEdit uid description =
         [ type_ "text"
         , id (entryEditId uid)
         , value description
+        , class "edit"
         , E.onInput (ChangedEntryDescription uid)
         , E.onBlur BlurredEntry
         , onEsc EscapedEntry
@@ -492,27 +501,59 @@ viewStatus entries =
         |> List.filter (not << .completed)
         |> List.length
   in
-  div []
-    [ text <| String.fromInt n ++ " " ++ pluralize n "task" "tasks" ++ " left" ]
-
-
-viewVisibilityFilters : Visibility -> Html Msg
-viewVisibilityFilters selected =
-  div []
-    [ viewVisibilityFilter "All" "#/" All selected
-    , text " "
-    , viewVisibilityFilter "Active" "#/active" Active selected
-    , text " "
-    , viewVisibilityFilter "Completed" "#/completed" Completed selected
+  span [ class "todo-count" ]
+    [ strong [] [ text (String.fromInt n) ]
+    , text <| " " ++ pluralize n "item" "items" ++ " left"
     ]
 
 
-viewVisibilityFilter : String -> String -> Visibility -> Visibility -> Html Msg
+viewVisibilityFilters : Visibility -> Html msg
+viewVisibilityFilters selected =
+  ul [ class "filters" ]
+    [ li [] [ viewVisibilityFilter "All" "#/" All selected ]
+    , li [] [ viewVisibilityFilter "Active" "#/active" Active selected ]
+    , li [] [ viewVisibilityFilter "Completed" "#/completed" Completed selected ]
+    ]
+
+
+viewVisibilityFilter : String -> String -> Visibility -> Visibility -> Html msg
 viewVisibilityFilter name url current selected =
   if current == selected then
-    span [] [ text name ]
+    span [ class "selected" ] [ text name ]
   else
     a [ href url ] [ text name ]
+
+
+viewClearCompleted : List Entry -> List (Html Msg)
+viewClearCompleted entries =
+  let
+    completedEntries =
+      List.filter .completed entries
+
+    numCompletedEntries =
+      List.length completedEntries
+  in
+  if numCompletedEntries == 0 then
+    []
+  else
+    [ button
+        [ type_ "button"
+        , class "clear-completed"
+        , E.onClick ClickedRemoveCompletedEntriesButton
+        ]
+        [ text <| "Clear completed (" ++ String.fromInt numCompletedEntries ++ ")" ]
+    ]
+
+
+viewFooter : Html msg
+viewFooter =
+  footer [ class "info" ]
+    [ p [] [ text "Double-click to edit a todo" ]
+    , p []
+        [ text "Written by "
+        , a [ href "https://github.com/dwayne" ] [ text "Dwayne Crooks" ]
+        ]
+    ]
 
 
 -- HELPERS
@@ -521,6 +562,16 @@ viewVisibilityFilter name url current selected =
 entryEditId : Int -> String
 entryEditId uid =
   "entry-edit-" ++ String.fromInt uid
+
+
+isEditing : Mode -> Entry -> Bool
+isEditing mode entry =
+  case mode of
+    Normal ->
+      False
+
+    Edit uid _ ->
+      uid == entry.uid
 
 
 keep : Visibility -> List Entry -> List Entry
