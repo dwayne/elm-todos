@@ -77,9 +77,7 @@ init savedState url key =
             model
 
           Err e ->
-            Debug.log
-              ("Unable to restore the saved state: " ++ Decode.errorToString e)
-              initModel
+            initModel
   , Cmd.none
   )
 
@@ -215,11 +213,9 @@ update msg model =
       )
 
     Focus (Err (Dom.NotFound e)) ->
-      Debug.log
-        ("The element to focus was not found: " ++ e)
-        ( model
-        , Cmd.none
-        )
+      ( model
+      , Cmd.none
+      )
 
     ChangedEntryDescription uid description ->
       ( { model | mode = Edit uid description }
