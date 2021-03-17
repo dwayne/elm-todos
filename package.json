@@ -2,6 +2,7 @@
   "private": "true",
   "scripts": {
     "build": "elm make src/Main.elm --debug --output=public/app.js",
+    "build:prod": "elm make src/Main.elm --output=public/app.js",
     "serve": "http-server-spa public index.html 8000"
   },
   "dependencies": {
