@@ -241,7 +241,10 @@ update msg model =
                 entry
           in
           if String.isEmpty cleanDescription then
-            ( { model | mode = Normal }
+            ( { model
+              | mode = Normal
+              , entries = List.filter (\entry -> entry.uid /= uid) model.entries
+              }
             , Cmd.none
             )
           else
