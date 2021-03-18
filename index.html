@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Elm Todos</title>
+
+    <link rel="stylesheet" href="/index.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="/app.js"></script>
+    <script>
+      const key = 'elm-todos-state';
+      const state = localStorage.getItem(key);
+      const savedModel = state ? JSON.parse(state) : null;
+      const app = Elm.Main.init({
+        node: document.getElementById("app"),
+        flags: savedModel
+      });
+
+      app.ports.save.subscribe(function (modelToSave) {
+        localStorage.setItem(key, JSON.stringify(modelToSave));
+      });
+    </script>
+  </body>
+</html>
