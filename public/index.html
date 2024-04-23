@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Elm Todos</title>
 
-    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/index.css" />
   </head>
   <body>
     <div id="app"></div>
     <script src="/app.js"></script>
     <script>
-      const key = 'elm-todos-state';
+      function toSavedModel(state) {
+        if (state) {
+          try {
+            return JSON.parse(state);
+          } catch (e) {
+            console.error("The saved state is corrupt", e);
+          }
+        }
+        return null;
+      }
+
+      const key = "elm-todos-state";
       const state = localStorage.getItem(key);
-      const savedModel = state ? JSON.parse(state) : null;
+      const savedModel = toSavedModel(state);
       const app = Elm.Main.init({
         node: document.getElementById("app"),
         flags: savedModel

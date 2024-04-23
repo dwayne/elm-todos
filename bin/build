@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+#
+# Usage: [optimize_js=0*|1] build
+#
+
+set -euo pipefail
+
+optimize_js="${optimize_js:-0}"
+
+src="${project:?}"
+out="${build:?}/application"
+
+clean () {
+  rm -rf "$out"
+}
+
+prepare () {
+  mkdir -p "$out"
+}
+
+copy_public () {
+  cp -r "$src/public/." "$out"
+}
+
+build_js () {
+  if [[ "$optimize_js" = 0 ]]; then
+    func=build_js_debug
+  else
+    func=build_js_optimize
+  fi
+
+  "$func" "$src/src/Main.elm" "$out/app.js"
+}
+
+build_js_debug () {
+  elm make "$1" --debug --output "$2"
+}
+
+build_js_optimize () {
+  elm make "$1" --optimize --output "$2"
+  minify "$2"
+}
+
+minify () {
+  js="$1"
+  min="${js%.js}.min.js"
+
+  terser "$js" --compress 'pure_funcs="F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9",pure_getters,keep_fargs=false,unsafe_comps,unsafe' | terser --mangle --output "$min"
+  mv "$min" "$js"
+}
+
+clean && prepare && copy_public && build_js

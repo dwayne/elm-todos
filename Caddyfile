@@ -1,0 +1,7 @@
+:{$port}
+
+root * {$build}/application
+
+file_server {
+  browse
+}
