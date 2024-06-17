@@ -3,5 +3,5 @@
 root * {$build}/application
 
 file_server {
-  browse
+	browse
 }
