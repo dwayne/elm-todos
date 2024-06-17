@@ -590,8 +590,8 @@ isEditing mode entry =
 
 
 keep : Visibility -> List Entry -> List Entry
-keep visible entries =
-    case visible of
+keep visibility entries =
+    case visibility of
         All ->
             entries
 
@@ -614,12 +614,16 @@ pluralize n singular plural =
 onEsc : msg -> H.Attribute msg
 onEsc msg =
     let
-        isEsc keyCode =
-            case keyCode of
-                27 ->
-                    JD.succeed msg
+        decoder =
+            HE.keyCode
+                |> JD.andThen
+                    (\n ->
+                        case n of
+                            27 ->
+                                JD.succeed msg
 
-                _ ->
-                    JD.fail "Not ESC"
+                            _ ->
+                                JD.fail "ignored"
+                    )
     in
-    HE.on "keydown" (JD.andThen isEsc HE.keyCode)
+    HE.on "keydown" decoder
