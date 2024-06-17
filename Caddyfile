@@ -2,6 +2,9 @@
 
 root * {$build}/application
 
+try_files {path} /
+
 file_server {
 	browse
+	precompressed br gzip
 }

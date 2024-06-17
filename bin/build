@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
 #
-# Usage: [optimize_js=0*|1] build
+# Usage: [optimize_html=0*|1] [optimize_css=0*|1] [optimize_js=0*|1|2|3] [compress=0*|1] build
 #
 
 set -euo pipefail
 
+optimize_html="${optimize_html:-0}"
+optimize_css="${optimize_css:-0}"
 optimize_js="${optimize_js:-0}"
+compress="${compress:-0}"
 
 src="${project:?}"
 out="${build:?}/application"
@@ -19,16 +22,45 @@ prepare () {
   mkdir -p "$out"
 }
 
-copy_public () {
-  cp -r "$src/public/." "$out"
+build_html () {
+  if [[ "$optimize_html" = 0 ]]; then
+    cp "$src/public/index.html" "$out"
+  else
+    html-minifier                         \
+      --collapse-boolean-attributes       \
+      --collapse-inline-tag-whitespace    \
+      --collapse-whitespace               \
+      --decode-entities                   \
+      --minify-js                         \
+      --remove-comments                   \
+      --remove-empty-attributes           \
+      --remove-redundant-attributes       \
+      --remove-script-type-attributes     \
+      --remove-style-link-type-attributes \
+      --remove-tag-whitespace             \
+      --file-ext html                     \
+      --input-dir "$src/public"           \
+      --output-dir "$out"
+  fi
+}
+
+build_css () {
+  if [[ "$optimize_css" = 0 ]]; then
+    cp "$src/public/index.css" "$out"
+  else
+    lightningcss --minify "$src/public/index.css" --output-file "$out/index.css"
+  fi
 }
 
 build_js () {
-  if [[ "$optimize_js" = 0 ]]; then
-    func=build_js_debug
-  else
-    func=build_js_optimize
-  fi
+  case "${optimize_js}" in
+    1|2|3)
+      func=build_js_optimize_"$optimize_js"
+      ;;
+    *)
+      func=build_js_debug
+      ;;
+  esac
 
   "$func" "$src/src/Main.elm" "$out/app.js"
 }
@@ -37,8 +69,18 @@ build_js_debug () {
   elm make "$1" --debug --output "$2"
 }
 
-build_js_optimize () {
+build_js_optimize_1 () {
   elm make "$1" --optimize --output "$2"
+  minify "$2"
+}
+
+build_js_optimize_2 () {
+  elm-optimize-level-2 "$1" --output "$2"
+  minify "$2"
+}
+
+build_js_optimize_3 () {
+  elm-optimize-level-2 "$1" --optimize-speed --output "$2"
   minify "$2"
 }
 
@@ -50,4 +92,10 @@ minify () {
   mv "$min" "$js"
 }
 
-clean && prepare && copy_public && build_js
+compress_assets () {
+  if [[ "$compress" != 0 ]]; then
+    cd "$out" && find . \( -name '*.html' -o -name '*.css' -o -name '*.js' \) -exec brotli "{}" \; -exec zopfli "{}" \;
+  fi
+}
+
+clean && prepare && build_html && build_css && build_js && compress_assets

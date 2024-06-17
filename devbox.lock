@@ -1,6 +1,26 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "brotli@latest": {
+      "last_modified": "2024-06-03T07:19:07Z",
+      "resolved": "github:NixOS/nixpkgs/4a4ecb0ab415c9fccfb005567a215e6a9564cdf5#brotli",
+      "source": "devbox-search",
+      "version": "1.1.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/nvdacalh5vfgpwgyvx4drydq4gwip9wm-brotli-1.1.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/yxlzmr9ikp9li6vffhwgicj6k661gafm-brotli-1.1.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/nic4hha0s64pc58pxfng2pidm1p9xjz0-brotli-1.1.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/0xj7i7pnp1xyk09qg8dgsvl60gz1psyl-brotli-1.1.0"
+        }
+      }
+    },
     "caddy@latest": {
       "last_modified": "2024-06-04T00:03:09Z",
       "resolved": "github:NixOS/nixpkgs/3b01abcc24846ae49957b30f4345bab4b3f1d14b#caddy",
@@ -41,6 +61,26 @@
         }
       }
     },
+    "elmPackages.elm-optimize-level-2@latest": {
+      "last_modified": "2024-05-22T06:18:38Z",
+      "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#elmPackages.elm-optimize-level-2",
+      "source": "devbox-search",
+      "version": "2-0.3.5",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/l4f2pwvpqxnshqamwy7764ilf45lp8ld-elm-optimize-level-2-0.3.5"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/x2bbn25699ai2g7pf7x7kyw5y1jsvbpk-elm-optimize-level-2-0.3.5"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/f7ccpq5zllj8qjplg8l60gfbwgxglipr-elm-optimize-level-2-0.3.5"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/h3hbwm3qhvj148c991glh6j00fq5wisb-elm-optimize-level-2-0.3.5"
+        }
+      }
+    },
     "elmPackages.elm@latest": {
       "last_modified": "2024-05-26T09:30:02Z",
       "resolved": "github:NixOS/nixpkgs/e2dd4e18cc1c7314e24154331bae07df76eb582f#elmPackages.elm",
@@ -58,6 +98,43 @@
         },
         "x86_64-linux": {
           "store_path": "/nix/store/45ayk9m68a7gn11ygpqx7k47dh3xhcm8-elm-0.19.1"
+        }
+      }
+    },
+    "html-minifier@latest": {
+      "last_modified": "2024-05-22T06:18:38Z",
+      "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#html-minifier",
+      "source": "devbox-search",
+      "version": "4.0.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/jx8jd3dymnkdvnyhcf97d0r0287xhqma-html-minifier-4.0.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/b1m4786h5rk062cvww4xdlpj6yw0jd6l-html-minifier-4.0.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/1a5wjlgpx82p1szngjp7dci5f5s8vhjk-html-minifier-4.0.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/r9vf6k8nfpx5irl26k1s0v5w9n9a5a39-html-minifier-4.0.0"
+        }
+      }
+    },
+    "lightningcss@latest": {
+      "last_modified": "2024-05-25T15:35:15Z",
+      "resolved": "github:NixOS/nixpkgs/c5187508b11177ef4278edf19616f44f21cc8c69#lightningcss",
+      "source": "devbox-search",
+      "version": "1.25.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/gilbrbnkagfwv1lzbv1ryd6aww1dfaq7-lightningcss-1.25.1"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/f12llla7w7w7hdc24piws3dlnrpy0hw3-lightningcss-1.25.1"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/k3vqcm4fvh2ym33rq41k8xbqbz03avi5-lightningcss-1.25.1"
         }
       }
     },
@@ -98,6 +175,26 @@
         },
         "x86_64-linux": {
           "store_path": "/nix/store/6a6205zvzyqgmad3a43j6mlyh0kwkac1-xdg-utils-1.2.1"
+        }
+      }
+    },
+    "zopfli@latest": {
+      "last_modified": "2024-05-29T18:25:13Z",
+      "resolved": "github:NixOS/nixpkgs/f7a63cf975cc66559d5f488ffe6367c987a79826#zopfli",
+      "source": "devbox-search",
+      "version": "1.0.3",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/r9kmjx0hmmrxfy3wsyv4hig4gnqwhqrc-zopfli-1.0.3"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/4mddyiqlrbdwkygf3caz57qjbq590g7j-zopfli-1.0.3"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/ksfybnqixn4dcxkzyr9wjirf9j0aiqwc-zopfli-1.0.3"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/bbx73by6f4p5pzvd3c68jkmi0vgj13bp-zopfli-1.0.3"
         }
       }
     }

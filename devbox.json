@@ -1,13 +1,18 @@
 {
   "packages": {
+    "brotli": "latest",
     "caddy": {
       "version": "latest",
       "disable_plugin": true
     },
     "elmPackages.elm": "latest",
     "elmPackages.elm-format": "latest",
+    "elmPackages.elm-optimize-level-2": "latest",
+    "html-minifier": "latest",
+    "lightningcss": "latest",
     "terser": "latest",
-    "xdg-utils": "latest"
+    "xdg-utils": "latest",
+    "zopfli": "latest"
   },
   "env": {
     "project": "$PWD",
