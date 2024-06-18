@@ -91,9 +91,9 @@ type Msg
     | CheckedMarkAllCompleted Bool
     | ClickedRemoveCompletedEntriesButton
     | DoubleClickedDescription Int String
-    | Focus (Result BD.Error ())
     | ChangedEntryDescription Int String
     | SubmittedEditedDescription
+    | FocusedEntry
     | BlurredEntry
     | EscapedEntry
 
@@ -105,7 +105,10 @@ updateAndSave msg model =
             update msg model
     in
     ( nextModel
-    , Cmd.batch [ cmd, save (encodeModel nextModel) ]
+    , Cmd.batch
+        [ cmd
+        , save (encodeModel nextModel)
+        ]
     )
 
 
@@ -189,17 +192,7 @@ update msg model =
 
         DoubleClickedDescription uid description ->
             ( { model | mode = Edit uid description }
-            , focus (entryEditId uid)
-            )
-
-        Focus (Ok ()) ->
-            ( model
-            , Cmd.none
-            )
-
-        Focus (Err (BD.NotFound e)) ->
-            ( model
-            , Cmd.none
+            , focus (entryEditId uid) FocusedEntry
             )
 
         ChangedEntryDescription uid description ->
@@ -242,6 +235,11 @@ update msg model =
                         , Cmd.none
                         )
 
+        FocusedEntry ->
+            ( model
+            , Cmd.none
+            )
+
         BlurredEntry ->
             ( { model | mode = Normal }
             , Cmd.none
@@ -256,11 +254,6 @@ update msg model =
 createEntry : Int -> String -> Entry
 createEntry uid description =
     Entry uid description False
-
-
-focus : String -> Cmd Msg
-focus htmlId =
-    Task.attempt Focus (BD.focus htmlId)
 
 
 
@@ -551,6 +544,12 @@ pluralize n singular plural =
 
     else
         plural
+
+
+focus : String -> msg -> Cmd msg
+focus id msg =
+    BD.focus id
+        |> Task.attempt (always msg)
 
 
 onEsc : msg -> H.Attribute msg
