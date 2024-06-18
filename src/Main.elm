@@ -34,7 +34,7 @@ type alias Model =
     , uid : Int
     , description : String
     , mode : Mode
-    , visible : Visibility
+    , visibility : Visibility
     , entries : List Entry
     }
 
@@ -143,7 +143,7 @@ update msg model =
                     )
 
         ChangedUrl url ->
-            ( { model | visible = toVisibility url }
+            ( { model | visibility = toVisibility url }
             , Cmd.none
             )
 
@@ -293,12 +293,12 @@ port save : JE.Value -> Cmd msg
 
 
 encodeModel : Model -> JE.Value
-encodeModel { uid, description, mode, visible, entries } =
+encodeModel { uid, description, mode, visibility, entries } =
     JE.object
         [ ( "uid", JE.int uid )
         , ( "description", JE.string description )
         , ( "mode", encodeMode mode )
-        , ( "visible", encodeVisibility visible )
+        , ( "visibility", encodeVisibility visibility )
         , ( "entries", JE.list encodeEntry entries )
         ]
 
@@ -318,8 +318,8 @@ encodeMode mode =
 
 
 encodeVisibility : Visibility -> JE.Value
-encodeVisibility visible =
-    case visible of
+encodeVisibility visibility =
+    case visibility of
         All ->
             JE.string "all"
 
@@ -387,13 +387,13 @@ entryDecoder =
 
 
 view : Model -> B.Document Msg
-view { description, mode, visible, entries } =
+view { description, mode, visibility, entries } =
     { title = "Elm Todos"
     , body =
         [ H.section [ HA.class "todoapp" ] <|
             [ viewPrompt description
             ]
-                ++ viewMain mode visible entries
+                ++ viewMain mode visibility entries
         , viewFooter
         ]
     }
@@ -418,7 +418,7 @@ viewPrompt description =
 
 
 viewMain : Mode -> Visibility -> List Entry -> List (H.Html Msg)
-viewMain mode visible entries =
+viewMain mode visibility entries =
     if List.isEmpty entries then
         []
 
@@ -444,11 +444,11 @@ viewMain mode visible entries =
                             ]
                             [ viewEntry mode entry ]
                     )
-                    (keep visible entries)
+                    (keep visibility entries)
             ]
         , H.footer [ HA.class "footer" ] <|
             [ viewStatus entries
-            , viewVisibilityFilters visible
+            , viewVisibilityFilters visibility
             ]
                 ++ viewClearCompleted entries
         ]
