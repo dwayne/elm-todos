@@ -12,27 +12,27 @@
     <div id="app"></div>
     <script src="/app.js"></script>
     <script>
-      function toSavedModel(state) {
-        if (state) {
+      function toData(json) {
+        if (json) {
           try {
-            return JSON.parse(state);
+            return JSON.parse(json);
           } catch (e) {
-            console.error("The saved state is corrupt", e);
+            console.error("The JSON is corrupt", json, e);
           }
         }
         return null;
       }
 
-      const key = "elm-todos-state";
-      const state = localStorage.getItem(key);
-      const savedModel = toSavedModel(state);
+      const key = "elm-todos-data";
+      const json = localStorage.getItem(key);
+      const data = toData(json);
       const app = Elm.Main.init({
         node: document.getElementById("app"),
-        flags: savedModel
+        flags: data
       });
 
-      app.ports.save.subscribe(function (modelToSave) {
-        localStorage.setItem(key, JSON.stringify(modelToSave));
+      app.ports.save.subscribe(function (data) {
+        localStorage.setItem(key, JSON.stringify(data));
       });
     </script>
   </body>

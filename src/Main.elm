@@ -58,41 +58,23 @@ type Visibility
 
 
 type alias Flags =
-    Maybe JE.Value
+    JE.Value
 
 
 init : Flags -> Url -> BN.Key -> ( Model, Cmd msg )
-init savedState url key =
+init data url key =
     let
         initModel =
             Model url key 0 "" Normal (toVisibility url) []
     in
-    ( case savedState of
-        Nothing ->
-            initModel
-
-        Just value ->
-            case JD.decodeValue (modelDecoder url key) value of
-                Ok model ->
-                    model
-
-                Err e ->
-                    initModel
-    , Cmd.none
-    )
-
-
-toVisibility : Url -> Visibility
-toVisibility url =
-    case ( url.path, url.fragment ) of
-        ( "/", Just "/active" ) ->
-            Active
-
-        ( "/", Just "/completed" ) ->
-            Completed
+    ( case JD.decodeValue (modelDecoder url key) data of
+        Ok (Just model) ->
+            model
 
         _ ->
-            All
+            initModel
+    , Cmd.none
+    )
 
 
 
@@ -293,41 +275,11 @@ port save : JE.Value -> Cmd msg
 
 
 encodeModel : Model -> JE.Value
-encodeModel { uid, description, mode, visibility, entries } =
+encodeModel { uid, entries } =
     JE.object
         [ ( "uid", JE.int uid )
-        , ( "description", JE.string description )
-        , ( "mode", encodeMode mode )
-        , ( "visibility", encodeVisibility visibility )
         , ( "entries", JE.list encodeEntry entries )
         ]
-
-
-encodeMode : Mode -> JE.Value
-encodeMode mode =
-    case mode of
-        Normal ->
-            JE.object [ ( "ctor", JE.string "Normal" ) ]
-
-        Edit uid description ->
-            JE.object
-                [ ( "ctor", JE.string "Edit" )
-                , ( "0", JE.int uid )
-                , ( "1", JE.string description )
-                ]
-
-
-encodeVisibility : Visibility -> JE.Value
-encodeVisibility visibility =
-    case visibility of
-        All ->
-            JE.string "all"
-
-        Active ->
-            JE.string "active"
-
-        Completed ->
-            JE.string "completed"
 
 
 encodeEntry : Entry -> JE.Value
@@ -343,35 +295,12 @@ encodeEntry { uid, description, completed } =
 -- DECODERS
 
 
-modelDecoder : Url -> BN.Key -> JD.Decoder Model
+modelDecoder : Url -> BN.Key -> JD.Decoder (Maybe Model)
 modelDecoder url key =
-    JD.map7 Model
-        (JD.succeed url)
-        (JD.succeed key)
-        (JD.field "uid" JD.int)
-        (JD.field "description" JD.string)
-        (JD.field "mode" modeDecoder)
-        (JD.succeed (toVisibility url))
-        (JD.field "entries" (JD.list entryDecoder))
-
-
-modeDecoder : JD.Decoder Mode
-modeDecoder =
-    JD.field "ctor" JD.string
-        |> JD.andThen
-            (\s ->
-                case s of
-                    "Normal" ->
-                        JD.succeed Normal
-
-                    "Edit" ->
-                        JD.map2 Edit
-                            (JD.field "0" JD.int)
-                            (JD.field "1" JD.string)
-
-                    _ ->
-                        JD.fail ("Unknown mode: " ++ s)
-            )
+    JD.nullable <|
+        JD.map2 (\uid entries -> Model url key uid "" Normal (toVisibility url) entries)
+            (JD.field "uid" JD.int)
+            (JD.field "entries" <| JD.list entryDecoder)
 
 
 entryDecoder : JD.Decoder Entry
@@ -572,6 +501,19 @@ viewFooter =
 
 
 -- HELPERS
+
+
+toVisibility : Url -> Visibility
+toVisibility url =
+    case ( url.path, url.fragment ) of
+        ( "/", Just "/active" ) ->
+            Active
+
+        ( "/", Just "/completed" ) ->
+            Completed
+
+        _ ->
+            All
 
 
 entryEditId : Int -> String
