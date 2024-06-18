@@ -151,7 +151,7 @@ update msg model =
                 ( { model
                     | uid = model.uid + 1
                     , description = ""
-                    , entries = model.entries ++ [ createEntry model.uid cleanDescription ]
+                    , entries = model.entries ++ [ Entry model.uid cleanDescription False ]
                   }
                 , Cmd.none
                 )
@@ -211,13 +211,6 @@ update msg model =
                     let
                         cleanDescription =
                             String.trim description
-
-                        updateEntry entry =
-                            if uid == entry.uid then
-                                { entry | description = cleanDescription }
-
-                            else
-                                entry
                     in
                     if String.isEmpty cleanDescription then
                         ( { model
@@ -228,6 +221,14 @@ update msg model =
                         )
 
                     else
+                        let
+                            updateEntry entry =
+                                if uid == entry.uid then
+                                    { entry | description = cleanDescription }
+
+                                else
+                                    entry
+                        in
                         ( { model
                             | mode = Normal
                             , entries = List.map updateEntry model.entries
@@ -249,11 +250,6 @@ update msg model =
             ( { model | mode = Normal }
             , Cmd.none
             )
-
-
-createEntry : Int -> String -> Entry
-createEntry uid description =
-    Entry uid description False
 
 
 
@@ -313,9 +309,8 @@ view { description, mode, visibility, entries } =
     { title = "Elm Todos"
     , body =
         [ H.section [ HA.class "todoapp" ] <|
-            [ viewPrompt description
-            ]
-                ++ viewMain mode visibility entries
+            viewPrompt description
+                :: viewMain mode visibility entries
         , viewFooter
         ]
     }
@@ -369,10 +364,12 @@ viewMain mode visibility entries =
                     (keep visibility entries)
             ]
         , H.footer [ HA.class "footer" ] <|
-            [ viewStatus entries
-            , viewVisibilityFilters visibility
-            ]
-                ++ viewClearCompleted entries
+            List.concat
+                [ [ viewStatus entries
+                  , viewVisibilityFilters visibility
+                  ]
+                , viewClearCompleted entries
+                ]
         ]
 
 
@@ -452,11 +449,11 @@ viewVisibilityFilters selected =
 
 viewVisibilityFilter : String -> String -> Visibility -> Visibility -> H.Html msg
 viewVisibilityFilter name url current selected =
-    if current == selected then
-        H.span [ HA.class "selected" ] [ H.text name ]
-
-    else
-        H.a [ HA.href url ] [ H.text name ]
+    H.a
+        [ HA.href url
+        , HA.classList [ ( "selected", current == selected ) ]
+        ]
+        [ H.text name ]
 
 
 viewClearCompleted : List Entry -> List (H.Html Msg)
