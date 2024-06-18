@@ -1,28 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport"content="width=device-width,initial-scale=1"><title>Elm Todos</title><link rel="stylesheet"href="/index.css"></head><body><div id="app"></div><script src="/app.js"></script><script>function toData(json) {
+        if (json) {
+          try {
+            return JSON.parse(json);
+          } catch (e) {
+            console.error("The JSON is corrupt", json, e);
+          }
+        }
+        return null;
+      }
 
-    <title>Elm Todos</title>
-
-    <link rel="stylesheet" href="/index.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    <script src="/app.js"></script>
-    <script>
-      const key = 'elm-todos-state';
-      const state = localStorage.getItem(key);
-      const savedModel = state ? JSON.parse(state) : null;
+      const key = "elm-todos-data";
+      const json = localStorage.getItem(key);
+      const data = toData(json);
       const app = Elm.Main.init({
         node: document.getElementById("app"),
-        flags: savedModel
+        flags: data
       });
 
-      app.ports.save.subscribe(function (modelToSave) {
-        localStorage.setItem(key, JSON.stringify(modelToSave));
-      });
-    </script>
-  </body>
-</html>
+      app.ports.save.subscribe(function (data) {
+        localStorage.setItem(key, JSON.stringify(data));
+      });</script></body></html>
