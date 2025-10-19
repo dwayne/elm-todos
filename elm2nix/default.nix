@@ -1,24 +1,21 @@
-{ nixpkgs ? <nixpkgs>
-, config ? {}
-}:
-
-with (import nixpkgs config);
-
+{ pkgs }:
 let
+  lib = pkgs.lib;
+
   mkDerivation =
-    { srcs ? ./elm-srcs.nix
-    , src
-    , name
+    { name
+    , src ? ../.
+    , srcs ? ./elm-srcs.nix
     , srcdir ? "./src"
-    , targets ? []
+    , targets ? ["Main"]
     , registryDat ? ./registry.dat
-    , outputJavaScript ? false
+    , outputJavaScript ? true
     }:
-    stdenv.mkDerivation {
+    pkgs.stdenv.mkDerivation {
       inherit name src;
 
-      buildInputs = [ elmPackages.elm ]
-        ++ lib.optional outputJavaScript nodePackages.uglify-js;
+      buildInputs = [ pkgs.elmPackages.elm ]
+        ++ lib.optional outputJavaScript pkgs.nodePackages.uglify-js;
 
       buildPhase = pkgs.elmPackages.fetchElmDeps {
         elmPackages = import srcs;
@@ -42,11 +39,7 @@ let
         '') targets)}
       '';
     };
-in mkDerivation {
+in
+mkDerivation {
   name = "elm-todos";
-  srcs = ./elm-srcs.nix;
-  src = ../.;
-  targets = ["Main"];
-  srcdir = "./src";
-  outputJavaScript = true;
 }
