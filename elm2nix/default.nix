@@ -45,7 +45,7 @@ let
 in mkDerivation {
   name = "elm-todos";
   srcs = ./elm-srcs.nix;
-  src = ./.;
+  src = ../.;
   targets = ["Main"];
   srcdir = "./src";
   outputJavaScript = true;
