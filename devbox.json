@@ -5,6 +5,7 @@
       "version": "latest",
       "disable_plugin": true
     },
+    "elm2nix": "latest",
     "elmPackages.elm": "latest",
     "elmPackages.elm-format": "latest",
     "elmPackages.elm-optimize-level-2": "latest",

@@ -41,6 +41,54 @@
         }
       }
     },
+    "elm2nix@latest": {
+      "last_modified": "2025-10-07T08:41:47Z",
+      "resolved": "github:NixOS/nixpkgs/bce5fe2bb998488d8e7e7856315f90496723793c#elm2nix",
+      "source": "devbox-search",
+      "version": "0.4.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hcm3wpvy3qmqzmlmmfwqgl6s96a1ilgx-elm2nix-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hcm3wpvy3qmqzmlmmfwqgl6s96a1ilgx-elm2nix-0.4.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/aacbgwd5d990ckv8b42b05fs5cwyfrlr-elm2nix-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/aacbgwd5d990ckv8b42b05fs5cwyfrlr-elm2nix-0.4.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/jas01bfsin0w5kwz45p7h05va95x3avf-elm2nix-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/jas01bfsin0w5kwz45p7h05va95x3avf-elm2nix-0.4.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/z91bkiridnh618f87b7qhy21incz8ncd-elm2nix-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/z91bkiridnh618f87b7qhy21incz8ncd-elm2nix-0.4.0"
+        }
+      }
+    },
     "elmPackages.elm-format@latest": {
       "last_modified": "2024-05-26T09:30:02Z",
       "resolved": "github:NixOS/nixpkgs/e2dd4e18cc1c7314e24154331bae07df76eb582f#elmPackages.elm-format",
@@ -100,6 +148,10 @@
           "store_path": "/nix/store/45ayk9m68a7gn11ygpqx7k47dh3xhcm8-elm-0.19.1"
         }
       }
+    },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2025-09-25T01:21:52Z",
+      "resolved": "github:NixOS/nixpkgs/e57b3b16ad8758fd681511a078f35c416a8cc939?lastModified=1758763312&narHash=sha256-puBMviZhYlqOdUUgEmMVJpXqC%2FToEqSvkyZ30qQ09xM%3D"
     },
     "html-minifier@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
