@@ -1,3 +1,5 @@
+# N.B. The formatting of this file can be improved.
+
 {
 
       "elm/browser" = {
