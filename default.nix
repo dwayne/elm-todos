@@ -43,11 +43,10 @@ let
       '';
     };
 in mkDerivation {
-  name = "elm-app-0.1.0";
+  name = "elm-todos";
   srcs = ./elm-srcs.nix;
   src = ./.;
   targets = ["Main"];
   srcdir = "./src";
-  outputJavaScript = false;
+  outputJavaScript = true;
 }
-
