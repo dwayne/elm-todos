@@ -24,7 +24,7 @@
       # 5. It would be nice to explore how I can expose a NixOS configuration to host my Elm web application.
       #
 
-      elm-todos = import ./elm2nix { inherit pkgs; };
+      elm-todos = pkgs.callPackage ./elm2nix {};
     in
     {
       packages.${system}.default = elm-todos;
