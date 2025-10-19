@@ -1,7 +1,5 @@
-{ pkgs }:
+{ lib, pkgs }:
 let
-  lib = pkgs.lib;
-
   mkDerivation =
     { name
     , src ? ../.
