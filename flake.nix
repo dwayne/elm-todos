@@ -25,8 +25,24 @@
       #
 
       elm-todos = pkgs.callPackage ./elm2nix { settings.name = "elm-todos"; };
+
+      fetchElmPackage = pkgs.callPackage ./elm2nix/fetchElmPackage.nix {};
     in
     {
-      packages.${system}.default = elm-todos;
+      packages.${system} = {
+        default = elm-todos;
+
+        elm-json = fetchElmPackage {
+          name = "elm/json";
+          version = "1.1.3";
+          hash = "sha256-n0UqN8c5XPBw2Sd+pMPjXCGL6Nd5GZjnXWIHjr1BqcM=";
+        };
+
+        elm-virtual-dom = fetchElmPackage {
+          name = "elm/virtual-dom";
+          version = "1.0.3";
+          hash = "sha256-yfQ16zr7ji63nurnvUpn1iAcM69R/R7JfRsDejT3Xq4=";
+        };
+      };
     };
 }
