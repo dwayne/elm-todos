@@ -27,6 +27,12 @@
       elm-todos = pkgs.callPackage ./elm2nix { settings.name = "elm-todos"; };
 
       fetchElmPackage = pkgs.callPackage ./elm2nix/fetchElmPackage.nix {};
+
+      bashScript = pkgs.elmPackages.fetchElmDeps {
+        elmPackages = import ./elm2nix/elm-srcs.nix;
+        elmVersion = "0.19.1";
+        registryDat = ./elm2nix/registry.dat;
+      };
     in
     {
       packages.${system} = {
@@ -44,5 +50,7 @@
           hash = "sha256-yfQ16zr7ji63nurnvUpn1iAcM69R/R7JfRsDejT3Xq4=";
         };
       };
+
+      inherit bashScript;
     };
 }
