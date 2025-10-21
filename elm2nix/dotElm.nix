@@ -17,12 +17,21 @@ let
       )
       ""
       elmDependencies;
+
+  drv =
+    runCommand "dotElm" {} ''
+      root="$out/${elmVersion}/packages"
+      mkdir -p "$root"
+
+      ln -s "${registryDat}" "$root/registry.dat"
+
+      ${symbolicLinks}
+    '';
 in
-runCommand "dotElm" {} ''
-  root="$out/${elmVersion}/packages"
-  mkdir -p "$root"
-
-  ln -s "${registryDat}" "$root/registry.dat"
-
-  ${symbolicLinks}
-''
+drv // {
+  prepareScript = ''
+    cp -LR "${drv}" .elm
+    chmod -R +w .elm
+    export ELM_HOME=.elm
+  '';
+}

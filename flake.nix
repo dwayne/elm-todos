@@ -55,6 +55,8 @@
           elmPackages;
 
       dotElm = pkgs.callPackage ./elm2nix/dotElm.nix { inherit elmDependencies registryDat; };
+
+      build = pkgs.callPackage ./elm2nix/build.nix {};
     in
     {
       packages.${system} = {
@@ -73,6 +75,12 @@
         };
 
         inherit dotElm;
+
+        build = build {
+          name = "elm-todos";
+          src = ./.;
+          inherit dotElm;
+        };
       };
 
       inherit bashScript elmDependencies;
