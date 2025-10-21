@@ -80,6 +80,7 @@
           name = "elm-todos";
           src = ./.;
           inherit dotElm;
+          minify = true;
         };
       };
 
