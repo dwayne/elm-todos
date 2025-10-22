@@ -38,9 +38,12 @@
           )
           elmPackages;
 
-      dotElm = pkgs.callPackage ./elm2nix/dotElm.nix { inherit elmDependencies registryDat; };
+      dotElm = pkgs.callPackage ./elm2nix/dotElm.nix {};
+      cache = dotElm { inherit elmDependencies registryDat; };
 
       build = pkgs.callPackage ./elm2nix/build.nix {};
+
+      mkElmDerivation = pkgs.callPackage ./elm2nix/mkElmDerivation.nix {};
     in
     {
       packages.${system} = {
@@ -58,13 +61,26 @@
           hash = "sha256-yfQ16zr7ji63nurnvUpn1iAcM69R/R7JfRsDejT3Xq4=";
         };
 
-        inherit dotElm;
+        inherit cache;
 
         build = build {
           name = "elm-todos";
           src = ./.;
-          inherit dotElm;
+          inherit cache;
           docs = true;
+          minify = true;
+          compress = true;
+        };
+
+        elm-todos = mkElmDerivation {
+          name = "elm-todos-1.0.0";
+          src = ./.;
+          elmLock = import ./elm2nix/elm-lock.nix;
+          registryDat = ./elm2nix/registry.dat;
+
+          output = "app.js";
+          docs = true;
+          optimize = true;
           minify = true;
           compress = true;
         };

@@ -1,7 +1,3 @@
-#
-# N.B. I can bring everything together into mkElmDerivation.
-#
-
 { brotli
 , elmPackages
 , lib
@@ -10,7 +6,7 @@
 }:
 { name
 , src
-, dotElm
+, cache
 
 , elmFiles ? ["Main.elm"]
 , output ? "elm.js"
@@ -33,7 +29,7 @@ stdenv.mkDerivation {
   ++ lib.optional compress brotli;
 
   buildPhase = ''
-    ${dotElm.prepareScript}
+    ${cache.init}
 
     ${lib.optionalString docs ''
       mkdir -p .build/share/doc

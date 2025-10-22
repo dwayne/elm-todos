@@ -1,7 +1,7 @@
 { lib
 , runCommand
-
-, elmDependencies
+}:
+{ elmDependencies
 , registryDat
 
 , elmVersion ? "0.19.1"
@@ -29,7 +29,7 @@ let
     '';
 in
 drv // {
-  prepareScript = ''
+  init = ''
     cp -LR "${drv}" .elm
     chmod -R +w .elm
     export ELM_HOME=.elm
