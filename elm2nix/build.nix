@@ -14,6 +14,7 @@
 
 , elmFiles ? ["Main.elm"]
 , output ? "elm.js"
+, docs ? false
 , debug ? false
 , optimize ? false
 , minify ? false
@@ -34,18 +35,22 @@ stdenv.mkDerivation {
   buildPhase = ''
     ${dotElm.prepareScript}
 
-    mkdir -p .build/share/doc
+    ${lib.optionalString docs ''
+      mkdir -p .build/share/doc
+    ''}
 
     elm make \
       ${builtins.concatStringsSep " " (builtins.map (f: "src/" + f) elmFiles)} \
       ${lib.optionalString debug "--debug"} \
       ${lib.optionalString optimize "--optimize"} \
+      ${lib.optionalString docs "--docs .build/share/doc/index.json"} \
       --output ".build/${output}" \
-      --docs .build/share/doc/index.json
 
-    if [ ! -f .build/share/doc/index.json ]; then
-      rm -r .build/share
-    fi
+    ${lib.optionalString docs ''
+      if [ ! -f .build/share/doc/index.json ]; then
+        rm -r .build/share
+      fi
+    ''}
 
     ${lib.optionalString minify ''
       uglifyjs ".build/${output}" \

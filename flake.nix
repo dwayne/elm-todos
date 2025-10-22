@@ -64,6 +64,7 @@
           name = "elm-todos";
           src = ./.;
           inherit dotElm;
+          docs = true;
           minify = true;
           compress = true;
         };
