@@ -11,6 +11,9 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       lib = pkgs.lib;
+
+      elmLock = lib.importJSON ./elm2nix/elm.lock;
+      registryDat = ./elm2nix/registry.dat;
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -24,5 +27,7 @@
           export PS1="($name) $PS1"
         '';
       };
+
+      inherit elmLock registryDat;
     };
 }
