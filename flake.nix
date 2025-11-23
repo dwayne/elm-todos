@@ -14,6 +14,8 @@
 
       elmLock = lib.importJSON ./elm2nix/elm.lock;
       registryDat = ./elm2nix/registry.dat;
+
+      fetchElmPackage = pkgs.callPackage ./nix/fetchElmPackage.nix {};
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -29,5 +31,9 @@
       };
 
       inherit elmLock registryDat;
+
+      lib = {
+        inherit fetchElmPackage;
+      };
     };
 }
