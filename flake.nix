@@ -38,7 +38,7 @@
 
       lib = {
         inherit fetchElmPackage elmDependencies;
-        inherit (h) preBuild dotElmLinks symbolicLinksToPackages;
+        inherit (h) preConfigure dotElmLinks symbolicLinksToPackages;
       };
     };
 }

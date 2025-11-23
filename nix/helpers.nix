@@ -5,7 +5,7 @@
 , elmVersion ? "0.19.1"
 }:
 let
-  preBuild = ''
+  preConfigure = ''
     cp -LR "${dotElmLinks}" .elm
     chmod -R +w .elm
     export ELM_HOME=.elm
@@ -32,4 +32,4 @@ let
       ""
       elmLock;
 in
-{ inherit preBuild dotElmLinks symbolicLinksToPackages; }
+{ inherit preConfigure dotElmLinks symbolicLinksToPackages; }
