@@ -17,6 +17,9 @@
 
       fetchElmPackage = pkgs.callPackage ./nix/fetchElmPackage.nix {};
       elmDependencies = pkgs.callPackage ./nix/elmDependencies.nix { inherit fetchElmPackage; };
+
+      helpers = pkgs.callPackage ./nix/helpers.nix { inherit fetchElmPackage; };
+      h = helpers { inherit elmLock registryDat; };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -35,6 +38,7 @@
 
       lib = {
         inherit fetchElmPackage elmDependencies;
+        inherit (h) preBuild dotElmLinks symbolicLinksToPackages;
       };
     };
 }
