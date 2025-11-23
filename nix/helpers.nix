@@ -1,7 +1,6 @@
-{ elmPackages, fetchElmPackage, runCommand, stdenv }:
+{ elmPackages, fetchzip, runCommand, stdenv }:
 { elmLock
 , registryDat
-
 , elmVersion ? "0.19.1"
 }:
 let
@@ -40,5 +39,17 @@ let
       )
       ""
       elmLock;
+
+  fetchElmPackage = { author, package, version, sha256 }:
+    fetchzip {
+      name = "${author}-${package}-${version}";
+      url = "https://github.com/${author}/${package}/archive/${version}.tar.gz";
+      meta.homepage = "https://github.com/${author}/${package}";
+      hash = builtins.convertHash {
+        hash = sha256;
+        hashAlgo = "sha256";
+        toHashFormat = "sri";
+      };
+    };
 in
-{ inherit mkElmDerivation preConfigure dotElmLinks symbolicLinksToPackages; }
+{ inherit mkElmDerivation preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage; }

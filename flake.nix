@@ -15,9 +15,7 @@
       elmLock = lib.importJSON ./elm2nix/elm.lock;
       registryDat = ./elm2nix/registry.dat;
 
-      fetchElmPackage = pkgs.callPackage ./nix/fetchElmPackage.nix {};
-
-      helpers = pkgs.callPackage ./nix/helpers.nix { inherit fetchElmPackage; };
+      helpers = pkgs.callPackage ./nix/helpers.nix {};
       h = helpers { inherit elmLock registryDat; };
 
       elmTodos = h.mkElmDerivation {
@@ -49,8 +47,7 @@
       inherit elmLock registryDat;
 
       lib = {
-        inherit fetchElmPackage;
-        inherit (h) preConfigure dotElmLinks symbolicLinksToPackages;
+        inherit (h) preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage;
       };
     };
 }
