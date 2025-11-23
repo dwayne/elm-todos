@@ -16,7 +16,6 @@
       registryDat = ./elm2nix/registry.dat;
 
       fetchElmPackage = pkgs.callPackage ./nix/fetchElmPackage.nix {};
-      elmDependencies = pkgs.callPackage ./nix/elmDependencies.nix { inherit fetchElmPackage; };
 
       helpers = pkgs.callPackage ./nix/helpers.nix { inherit fetchElmPackage; };
       h = helpers { inherit elmLock registryDat; };
@@ -50,7 +49,7 @@
       inherit elmLock registryDat;
 
       lib = {
-        inherit fetchElmPackage elmDependencies;
+        inherit fetchElmPackage;
         inherit (h) preConfigure dotElmLinks symbolicLinksToPackages;
       };
     };
