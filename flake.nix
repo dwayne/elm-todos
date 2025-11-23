@@ -20,6 +20,14 @@
 
       helpers = pkgs.callPackage ./nix/helpers.nix { inherit fetchElmPackage; };
       h = helpers { inherit elmLock registryDat; };
+
+      elmTodos = h.mkElmDerivation {
+        name = "elm-todos";
+        src = ./.;
+        buildPhase = ''
+          elm make src/Main.elm --output "$out/app.js"
+        '';
+      };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -32,6 +40,11 @@
         shellHook = ''
           export PS1="($name) $PS1"
         '';
+      };
+
+      packages.${system} = {
+        inherit elmTodos;
+        default = elmTodos;
       };
 
       inherit elmLock registryDat;

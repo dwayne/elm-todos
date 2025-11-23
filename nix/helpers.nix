@@ -1,10 +1,19 @@
-{ fetchElmPackage, runCommand }:
+{ elmPackages, fetchElmPackage, runCommand, stdenv }:
 { elmLock
 , registryDat
 
 , elmVersion ? "0.19.1"
 }:
 let
+  mkElmDerivation = args:
+    stdenv.mkDerivation (args // {
+      nativeBuildInputs = builtins.concatLists
+        [ [ elmPackages.elm ]
+          (args.nativeBuildInputs or [])
+        ];
+      preConfigure = preConfigure + (args.preConfigure or "");
+    });
+
   preConfigure = ''
     cp -LR "${dotElmLinks}" .elm
     chmod -R +w .elm
@@ -32,4 +41,4 @@ let
       ""
       elmLock;
 in
-{ inherit preConfigure dotElmLinks symbolicLinksToPackages; }
+{ inherit mkElmDerivation preConfigure dotElmLinks symbolicLinksToPackages; }
