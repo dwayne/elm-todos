@@ -1,7 +1,7 @@
 {
   inputs = {
     elm2nix = {
-      url = "git+ssh://git@github.com/dwayne/elm2nix?rev=4fa3a3c882eebbe649c6edfbde7b11ba017a6cc1";
+      url = "git+ssh://git@github.com/dwayne/elm2nix?rev=2216e3efe9145142acb837078257ee74c576c20d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
