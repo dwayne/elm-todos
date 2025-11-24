@@ -4,6 +4,7 @@
 , lib
 , runCommand
 , stdenv
+, terser
 , uglify-js
 
 , elmVersion ? "0.19.1"
@@ -17,8 +18,7 @@ let
     , enableDebugger ? false
     , enableOptimizations ? false
     , enableMinification ? false
-    , minifier ? uglify-js
-    , createMinificationScript ? createUglifyScript # :: { output, outputMin } -> String
+    , useTerser ? false # Use UglifyJS by default
     , enableCompression ? false
     , ...
     } @ args:
@@ -34,12 +34,13 @@ let
 
     let
       outputMin = "${lib.removeSuffix ".js" output}.min.js";
+      minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
     in
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
         [ ([ elmPackages.elm ]
-          ++ lib.optional enableMinification minifier
+          ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           (args.nativeBuildInputs or [])
         ];
@@ -55,7 +56,11 @@ let
           ${lib.optionalString enableOptimizations "--optimize"} \
           --output "$out/${output}"
 
-        ${lib.optionalString enableMinification (createMinificationScript { inherit output outputMin; })}
+        ${lib.optionalString enableMinification ''
+          ${minifier} "$out/${output}" \
+            --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
+            | ${minifier} --mangle --output "$out/${outputMin}"
+        ''}
 
         ${lib.optionalString enableCompression ''
           gzip -9 -c "$out/${toCompress}" > "$out/${toCompress}.gz"
@@ -65,12 +70,6 @@ let
         runHook postBuild
       '';
     });
-
-  createUglifyScript = { output, outputMin }: ''
-    uglifyjs "$out/${output}" \
-        --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
-        | uglifyjs --mangle --output "$out/${outputMin}"
-  '';
 
   preConfigure = args: ''
     cp -LR "${dotElmLinks args}" .elm
@@ -111,4 +110,11 @@ let
       };
     };
 in
-{ inherit mkElmDerivation preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage; }
+{ inherit
+    preConfigure
+    dotElmLinks
+    symbolicLinksToPackages
+    fetchElmPackage;
+
+  mkElmDerivation = lib.makeOverridable mkElmDerivation;
+}

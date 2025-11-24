@@ -22,6 +22,7 @@
         output = "app.js";
         enableOptimizations = true;
         enableMinification = true;
+        useTerser = true;
         enableCompression = true;
       };
     in
