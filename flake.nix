@@ -12,14 +12,14 @@
       pkgs = nixpkgs.legacyPackages.${system};
       lib = pkgs.lib;
 
-      e2n = pkgs.callPackage ./elm2nix.nix {} {
-        elmLock = ./elm.lock;
-        registryDat = ./registry.dat;
-      };
+      e2n = pkgs.callPackage ./elm2nix.nix {};
 
       elmTodos = e2n.mkElmDerivation {
         name = "elm-todos";
         src = ./.;
+        elmLock = ./elm.lock;
+        registryDat = ./registry.dat;
+
         buildPhase = ''
           elm make src/Main.elm --output "$out/app.js"
         '';

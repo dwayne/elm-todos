@@ -1,35 +1,38 @@
-{ elmPackages, fetchzip, lib, runCommand, stdenv }:
-{ elmLock
-, registryDat
+{ elmPackages
+, fetchzip
+, lib
+, runCommand
+, stdenv
+
 , elmVersion ? "0.19.1"
 }:
 let
-  mkElmDerivation = args:
+  mkElmDerivation = { elmLock, registryDat, ... } @ args:
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
         [ [ elmPackages.elm ]
           (args.nativeBuildInputs or [])
         ];
-      preConfigure = preConfigure + (args.preConfigure or "");
+      preConfigure = preConfigure { inherit elmLock registryDat; } + (args.preConfigure or "");
     });
 
-  preConfigure = ''
-    cp -LR "${dotElmLinks}" .elm
+  preConfigure = args: ''
+    cp -LR "${dotElmLinks args}" .elm
     chmod -R +w .elm
     export ELM_HOME=.elm
   '';
 
-  dotElmLinks =
+  dotElmLinks = { elmLock, registryDat }:
     runCommand "dot-elm-links" {} ''
       root="$out/${elmVersion}/packages"
       mkdir -p "$root"
 
       ln -s "${registryDat}" "$root/registry.dat"
 
-      ${symbolicLinksToPackages}
+      ${symbolicLinksToPackages elmLock}
     '';
 
-  symbolicLinksToPackages =
+  symbolicLinksToPackages = elmLock:
     builtins.foldl'
       (script: { author, package, version, sha256 } @ dep:
         script + ''
