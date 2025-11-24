@@ -7,13 +7,29 @@
 , elmVersion ? "0.19.1"
 }:
 let
-  mkElmDerivation = { elmLock, registryDat, ... } @ args:
+  mkElmDerivation =
+    { elmLock
+    , registryDat
+    , entry ? "src/Main.elm" # :: String | [String]
+    , ...
+    } @ args:
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
         [ [ elmPackages.elm ]
           (args.nativeBuildInputs or [])
         ];
+
       preConfigure = preConfigure { inherit elmLock registryDat; } + (args.preConfigure or "");
+
+      buildPhase = ''
+        runHook preBuild
+
+        elm make \
+          ${builtins.concatStringsSep " " (if builtins.isList entry then entry else [ entry ])} \
+          --output "$out/elm.js"
+
+        runHook postBuild
+      '';
     });
 
   preConfigure = args: ''

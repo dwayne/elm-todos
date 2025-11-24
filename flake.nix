@@ -19,10 +19,6 @@
         src = ./.;
         elmLock = ./elm.lock;
         registryDat = ./registry.dat;
-
-        buildPhase = ''
-          elm make src/Main.elm --output "$out/app.js"
-        '';
       };
     in
     {
