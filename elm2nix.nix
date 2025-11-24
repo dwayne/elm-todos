@@ -1,21 +1,46 @@
-{ elmPackages
+{ brotli
+, elmPackages
 , fetchzip
 , lib
 , runCommand
 , stdenv
+, uglify-js
 
 , elmVersion ? "0.19.1"
 }:
 let
   mkElmDerivation =
-    { elmLock
-    , registryDat
+    { elmLock # Path to elm.lock
+    , registryDat # Path to registry.dat
     , entry ? "src/Main.elm" # :: String | [String]
+    , output ? "elm.js" # :: String
+    , enableDebugger ? false
+    , enableOptimizations ? false
+    , enableMinification ? false
+    , minifier ? uglify-js
+    , createMinificationScript ? createUglifyScript # :: { output, outputMin } -> String
+    , enableCompression ? false
     , ...
     } @ args:
+
+    assert !(enableDebugger && enableOptimizations)
+      || throw "You cannot enable both the debugger and optimizations at the same time.";
+
+    assert !(enableDebugger && enableMinification)
+      || throw "You cannot enable both the debugger and minification at the same time.";
+
+    assert !(enableDebugger && enableCompression)
+      || throw "You cannot enable both the debugger and compression at the same time.";
+
+    let
+      outputMin = "${lib.removeSuffix ".js" output}.min.js";
+      toCompress = if enableMinification then outputMin else output;
+    in
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
-        [ [ elmPackages.elm ]
+        [ ([ elmPackages.elm ]
+          ++ lib.optional enableMinification minifier
+          ++ lib.optional enableCompression brotli)
           (args.nativeBuildInputs or [])
         ];
 
@@ -26,11 +51,26 @@ let
 
         elm make \
           ${builtins.concatStringsSep " " (if builtins.isList entry then entry else [ entry ])} \
-          --output "$out/elm.js"
+          ${lib.optionalString enableDebugger "--debug"} \
+          ${lib.optionalString enableOptimizations "--optimize"} \
+          --output "$out/${output}"
+
+        ${lib.optionalString enableMinification (createMinificationScript { inherit output outputMin; })}
+
+        ${lib.optionalString enableCompression ''
+          gzip -9 -c "$out/${toCompress}" > "$out/${toCompress}.gz"
+          brotli -Z -c "$out/${toCompress}" > "$out/${toCompress}.br"
+        ''}
 
         runHook postBuild
       '';
     });
+
+  createUglifyScript = { output, outputMin }: ''
+    uglifyjs "$out/${output}" \
+        --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
+        | uglifyjs --mangle --output "$out/${outputMin}"
+  '';
 
   preConfigure = args: ''
     cp -LR "${dotElmLinks args}" .elm

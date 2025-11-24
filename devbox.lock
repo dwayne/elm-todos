@@ -101,6 +101,10 @@
         }
       }
     },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2025-11-03T07:53:02Z",
+      "resolved": "github:NixOS/nixpkgs/7241bcbb4f099a66aafca120d37c65e8dda32717?lastModified=1762156382&narHash=sha256-Yg7Ag7ov5%2B36jEFC1DaZh%2F12SEXo6OO3%2F8rqADRxiqs%3D"
+    },
     "html-minifier@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#html-minifier",

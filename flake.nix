@@ -19,6 +19,10 @@
         src = ./.;
         elmLock = ./elm.lock;
         registryDat = ./registry.dat;
+        output = "app.js";
+        enableOptimizations = true;
+        enableMinification = true;
+        enableCompression = true;
       };
     in
     {
