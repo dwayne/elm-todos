@@ -12,13 +12,12 @@
       pkgs = nixpkgs.legacyPackages.${system};
       lib = pkgs.lib;
 
-      helpers = pkgs.callPackage ./nix/helpers.nix {};
-      h = helpers {
-        elmLock = ./elm2nix/elm.lock;
-        registryDat = ./elm2nix/registry.dat;
+      e2n = pkgs.callPackage ./elm2nix.nix {} {
+        elmLock = ./elm.lock;
+        registryDat = ./registry.dat;
       };
 
-      elmTodos = h.mkElmDerivation {
+      elmTodos = e2n.mkElmDerivation {
         name = "elm-todos";
         src = ./.;
         buildPhase = ''
@@ -45,7 +44,7 @@
       };
 
       lib = {
-        inherit (h) preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage;
+        inherit (e2n) preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage;
       };
     };
 }
