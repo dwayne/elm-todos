@@ -1,4 +1,4 @@
-{ elmPackages, fetchzip, runCommand, stdenv }:
+{ elmPackages, fetchzip, lib, runCommand, stdenv }:
 { elmLock
 , registryDat
 , elmVersion ? "0.19.1"
@@ -38,7 +38,7 @@ let
         ''
       )
       ""
-      elmLock;
+      (lib.importJSON elmLock);
 
   fetchElmPackage = { author, package, version, sha256 }:
     fetchzip {
