@@ -54,20 +54,37 @@ let
           ${builtins.concatStringsSep " " (if builtins.isList entry then entry else [ entry ])} \
           ${lib.optionalString enableDebugger "--debug"} \
           ${lib.optionalString enableOptimizations "--optimize"} \
-          --output "$out/${output}"
-
-        ${lib.optionalString enableMinification ''
-          ${minifier} "$out/${output}" \
-            --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
-            | ${minifier} --mangle --output "$out/${outputMin}"
-        ''}
-
-        ${lib.optionalString enableCompression ''
-          gzip -9 -c "$out/${toCompress}" > "$out/${toCompress}.gz"
-          brotli -Z -c "$out/${toCompress}" > "$out/${toCompress}.br"
-        ''}
+          --output ".build/${output}"
 
         runHook postBuild
+      '';
+
+      installPhase = ''
+        runHook preInstall
+
+        cp -R .build "$out"
+
+        runHook postInstall
+      '';
+
+      #
+      # Learn more: https://guide.elm-lang.org/optimization/asset_size
+      #
+
+      preFixupPhases =
+        (lib.optional enableMinification "minificationPhase")
+        ++ (lib.optional enableCompression "compressionPhase")
+        ;
+
+      minificationPhase = ''
+        ${minifier} "$out/${output}" \
+          --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
+          | ${minifier} --mangle --output "$out/${outputMin}"
+      '';
+
+      compressionPhase = ''
+        gzip -9 -c "$out/${toCompress}" > "$out/${toCompress}.gz"
+        brotli -Z -c "$out/${toCompress}" > "$out/${toCompress}.br"
       '';
     });
 
