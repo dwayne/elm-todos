@@ -15,6 +15,7 @@ let
     , registryDat # Path to registry.dat
     , entry ? "src/Main.elm" # :: String | [String]
     , output ? "elm.js" # :: String
+    , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
     , enableDebugger ? false
     , enableOptimizations ? false
     , enableMinification ? false
@@ -33,7 +34,6 @@ let
       || throw "You cannot enable both the debugger and compression at the same time.";
 
     let
-      outputMin = "${lib.removeSuffix ".js" output}.min.js";
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
     in
