@@ -16,6 +16,7 @@ let
     , entry ? "src/Main.elm" # :: String | [String]
     , output ? "elm.js" # :: String
     , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
+    , extraNativeBuildInputs ? []
     , enableDebugger ? false
     , enableOptimizations ? false
     , enableMinification ? false
@@ -46,7 +47,7 @@ let
         [ ([ elmPackages.elm ]
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
-          (args.nativeBuildInputs or [])
+          extraNativeBuildInputs
         ];
 
       preConfigure = preConfigure { inherit elmLock registryDat; };
