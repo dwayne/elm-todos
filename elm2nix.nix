@@ -23,6 +23,7 @@ let
     , enableCompression ? false
     , gzipArgs ? [ "-9" ]
     , brotliArgs ? [ "-Z" ]
+    , showStats ? true
     , ...
     } @ args:
 
@@ -38,6 +39,7 @@ let
     let
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
+
     in
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
@@ -87,6 +89,30 @@ let
       compressionPhase = ''
         gzip ${builtins.concatStringsSep " " gzipArgs} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
         brotli ${builtins.concatStringsSep " " brotliArgs} -c "$out/${toCompress}" > "$out/${toCompress}.br"
+      '';
+
+      preFixup = lib.optionalString showStats ''
+        js="${output}"
+        js_size=$(stat -c%s $out/$js)
+        echo "Compiled size: $js_size bytes ($js)"
+
+        ${lib.optionalString enableMinification ''
+          min="${outputMin}"
+          min_size=$(stat -c%s $out/$min)
+          min_pct=$(( 100 * min_size / js_size ))
+          echo "Minified size: $min_size bytes ($min) (''${min_pct}% of compiled)"
+        ''}
+
+        ${lib.optionalString enableCompression ''
+          gz="${toCompress}.gz"
+          gz_size=$(stat -c%s $out/$gz)
+          gz_pct=$(( 100 * gz_size / js_size ))
+          br="${toCompress}.br"
+          br_size=$(stat -c%s $out/$br)
+          br_pct=$(( 100 * br_size / js_size ))
+          echo "Gzipped size: $gz_size bytes ($gz) (''${gz_pct}% of compiled)"
+          echo "Brotlied size: $br_size bytes ($br) (''${br_pct}% of compiled)"
+        ''}
       '';
     });
 
