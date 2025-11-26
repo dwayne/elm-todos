@@ -49,7 +49,7 @@ let
           (args.nativeBuildInputs or [])
         ];
 
-      preConfigure = preConfigure { inherit elmLock registryDat; } + (args.preConfigure or "");
+      preConfigure = preConfigure { inherit elmLock registryDat; };
 
       buildPhase = ''
         runHook preBuild
