@@ -24,7 +24,7 @@ let
     , enableCompression ? false
     , gzipArgs ? [ "-9" ]
     , brotliArgs ? [ "-Z" ]
-    , showStats ? true
+    , showStats ? false
     , ...
     } @ args:
 
