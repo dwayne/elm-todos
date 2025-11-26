@@ -21,6 +21,8 @@ let
     , enableMinification ? false
     , useTerser ? false # Use UglifyJS by default
     , enableCompression ? false
+    , gzipArgs ? [ "-9" ]
+    , brotliArgs ? [ "-Z" ]
     , ...
     } @ args:
 
@@ -83,8 +85,8 @@ let
       '';
 
       compressionPhase = ''
-        gzip -9 -c "$out/${toCompress}" > "$out/${toCompress}.gz"
-        brotli -Z -c "$out/${toCompress}" > "$out/${toCompress}.br"
+        gzip ${builtins.concatStringsSep " " gzipArgs} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
+        brotli ${builtins.concatStringsSep " " brotliArgs} -c "$out/${toCompress}" > "$out/${toCompress}.br"
       '';
     });
 
