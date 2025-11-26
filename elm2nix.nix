@@ -118,6 +118,8 @@ let
     });
 
   preConfigure = args: ''
+    echo "preparing ELM_HOME"
+
     cp -LR "${dotElmLinks args}" .elm
     chmod -R +w .elm
     export ELM_HOME=.elm
