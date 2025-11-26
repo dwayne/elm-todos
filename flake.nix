@@ -13,13 +13,11 @@
         pkgs = nixpkgs.legacyPackages.${system};
         lib = pkgs.lib;
 
-        e2n = pkgs.callPackage ./elm2nix.nix {};
+        e2n = pkgs.callPackage ./elm2nix.nix { elm2nix = elm2nix.packages.${system}.default; };
 
         elmTodos = e2n.mkElmDerivation {
           name = "elm-todos";
           src = ./.;
-          elmLock = ./elm.lock;
-          registryDat = ./registry.dat;
           output = "app.js";
           enableOptimizations = true;
           enableMinification = true;
@@ -30,10 +28,6 @@
       {
         devShells.default = pkgs.mkShell {
           name = "dev";
-
-          packages = [
-            elm2nix.packages.${system}.default
-          ];
 
           shellHook = ''
             export PS1="($name) $PS1"

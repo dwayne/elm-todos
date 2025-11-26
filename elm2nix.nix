@@ -7,13 +7,12 @@
 , terser
 , uglify-js
 
+, elm2nix
 , elmVersion ? "0.19.1"
 }:
 let
   mkElmDerivation =
-    { elmLock # Path to elm.lock
-    , registryDat # Path to registry.dat
-    , entry ? "src/Main.elm" # :: String | [String]
+    { entry ? "src/Main.elm" # :: String | [String]
     , output ? "elm.js" # :: String
     , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
     , extraNativeBuildInputs ? []
@@ -44,13 +43,28 @@ let
     in
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
-        [ ([ elmPackages.elm ]
+        [ [ elm2nix ]
+          ([ elmPackages.elm ]
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           extraNativeBuildInputs
         ];
 
-      preConfigure = preConfigure { inherit elmLock registryDat; };
+      # nix build
+      # > An unexpected error occurred: nix-prefetch-url: startProcess: posix_spawnp: does not exist (No such file or directory)
+      # > HasCallStack backtrace:
+      # >   collectBacktraces, called at libraries/ghc-internal/src/GHC/Internal/Exception.hs:169:13 in ghc-internal:GHC.Internal.Exception
+      # >   toExceptionWithBacktrace, called at libraries/ghc-internal/src/GHC/Internal/IO.hs:260:11 in ghc-internal:GHC.Internal.IO
+      # >   throwIO, called at src/UnliftIO/Internals/Async.hs:812:24 in unliftio-0.2.25.1-7G8eSN5vKNn4MibRD7sB1R:UnliftIO.Internals.Async
+
+      preConfigure = ''
+        ls -al
+        elm2nix --help
+        elm2nix lock
+        elm2nix registry generate
+        exit 1
+      '';
+      # ++ preConfigure { inherit elmLock registryDat; };
 
       buildPhase = ''
         runHook preBuild
