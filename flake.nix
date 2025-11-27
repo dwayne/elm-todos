@@ -1,7 +1,7 @@
 {
   inputs = {
     elm2nix = {
-      url = "git+ssh://git@github.com/dwayne/elm2nix?rev=2216e3efe9145142acb837078257ee74c576c20d";
+      url = "git+ssh://git@github.com/dwayne/elm2nix?rev=3fa2c5bb6a1d01b6788369057a9edc46d3c78e72";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -11,11 +11,9 @@
     flake-utils.lib.eachDefaultSystem(system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        lib = pkgs.lib;
+        mkElmDerivation = (elm2nix.lib.elm2nix pkgs).mkElmDerivation;
 
-        e2n = pkgs.callPackage ./elm2nix.nix {};
-
-        elmTodos = e2n.mkElmDerivation {
+        elmTodos = mkElmDerivation {
           name = "elm-todos";
           src = ./.;
           elmLock = ./elm.lock;
@@ -43,10 +41,6 @@
         packages = {
           inherit elmTodos;
           default = elmTodos;
-        };
-
-        lib = {
-          inherit (e2n) preConfigure dotElmLinks symbolicLinksToPackages fetchElmPackage;
         };
       }
     );

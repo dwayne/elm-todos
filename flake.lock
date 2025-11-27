@@ -10,16 +10,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1763859893,
-        "narHash": "sha256-6tmGqwkuPeX88ufYxmI0joL2R9PalxcTUtTny/q6+sw=",
+        "lastModified": 1764236358,
+        "narHash": "sha256-g/ZSHS3xI2f2OsD7YlLOYpWaPc0sbFyestp+P5U05r4=",
         "ref": "refs/heads/master",
-        "rev": "2216e3efe9145142acb837078257ee74c576c20d",
-        "revCount": 88,
+        "rev": "3fa2c5bb6a1d01b6788369057a9edc46d3c78e72",
+        "revCount": 89,
         "type": "git",
         "url": "ssh://git@github.com/dwayne/elm2nix"
       },
       "original": {
-        "rev": "2216e3efe9145142acb837078257ee74c576c20d",
+        "rev": "3fa2c5bb6a1d01b6788369057a9edc46d3c78e72",
         "type": "git",
         "url": "ssh://git@github.com/dwayne/elm2nix"
       }
