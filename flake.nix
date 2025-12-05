@@ -1,7 +1,7 @@
 {
   inputs = {
     elm2nix = {
-      url = "git+ssh://git@github.com/dwayne/elm2nix?rev=3fa2c5bb6a1d01b6788369057a9edc46d3c78e72";
+      url = "git+ssh://git@github.com/dwayne/elm2nix?ref=prepare-for-first-release";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -11,18 +11,13 @@
     flake-utils.lib.eachDefaultSystem(system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        mkElmDerivation = (elm2nix.lib.elm2nix pkgs).mkElmDerivation;
+        inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
-        elmTodos = mkElmDerivation {
+        elmTodos = buildElmApplication {
           name = "elm-todos";
           src = ./.;
           elmLock = ./elm.lock;
           registryDat = ./registry.dat;
-          output = "app.js";
-          enableOptimizations = true;
-          enableMinification = true;
-          useTerser = true;
-          enableCompression = true;
         };
       in
       {
