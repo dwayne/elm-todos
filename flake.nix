@@ -33,9 +33,35 @@
           '';
         };
 
-        packages = {
+        packages = rec {
           inherit elmTodos;
+
           default = elmTodos;
+
+          debugElmTodos = elmTodos.override {
+            enableDebugger = true;
+            output = "debug-elm.js";
+          };
+
+          checkedElmTodos = elmTodos.override {
+            doElmFormat = true;
+            doElmTest = true;
+            output = "checked-elm.js";
+          };
+
+          optimizedElmTodos = checkedElmTodos.override {
+            output = "optimized-elm.js";
+            enableOptimizations = true;
+            optimizeLevel = 2;
+            doMinification = true;
+            doCompression = true;
+            doReporting = true;
+          };
+
+          hashedElmTodos = optimizedElmTodos.override {
+            output = "hashed-elm.js";
+            doContentHashing = true;
+          };
         };
       }
     );
