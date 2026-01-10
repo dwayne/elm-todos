@@ -14,15 +14,14 @@
 
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
-        elmTodos = buildElmApplication {
+        elmTodosHtml = pkgs.callPackage ./nix/build-html.nix {};
+        elmTodosCss = pkgs.callPackage ./nix/build-css.nix {};
+        elmTodosJs = buildElmApplication {
           name = "elm-todos";
           src = ./.;
           elmLock = ./elm.lock;
           output = "app.js";
         };
-
-        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
-        buildCSS = pkgs.callPackage ./nix/build-css.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -38,11 +37,8 @@
         };
 
         packages = {
-          inherit elmTodos;
-          default = elmTodos;
-
-          elmTodosHtml = buildHtml { enableOptimizations = true; };
-          elmTodosCSS = buildCSS { enableOptimizations = true; };
+          inherit elmTodosHtml elmTodosCss elmTodosJs;
+          default = elmTodosJs;
         };
       }
     );

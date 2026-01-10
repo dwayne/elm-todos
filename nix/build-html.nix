@@ -1,6 +1,7 @@
-{ html-minifier, stdenv }:
+{ html-minifier
+, stdenv
 
-{ enableOptimizations ? false
+, enableOptimizations ? false
 }:
 
 stdenv.mkDerivation {

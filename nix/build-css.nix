@@ -1,6 +1,7 @@
-{ lightningcss, stdenv }:
+{ lightningcss
+, stdenv
 
-{ enableOptimizations ? false
+, enableOptimizations ? false
 }:
 
 stdenv.mkDerivation {
@@ -13,7 +14,7 @@ stdenv.mkDerivation {
 
   installPhase =
     let
-      buildCSSScript =
+      buildCssScript =
         if enableOptimizations then
           ''
           lightningcss --minify "public/index.css" --output-file "$out/index.css"
@@ -28,7 +29,7 @@ stdenv.mkDerivation {
     runHook preInstall
 
     mkdir "$out"
-    ${buildCSSScript}
+    ${buildCssScript}
 
     runHook postInstall
     '';
