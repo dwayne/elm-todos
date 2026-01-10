@@ -11,16 +11,18 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
-        elmTodosHtml = pkgs.callPackage ./nix/build-html.nix {};
-        elmTodosCss = pkgs.callPackage ./nix/build-css.nix {};
-        elmTodosJs = buildElmApplication {
-          name = "elm-todos";
-          src = ./.;
-          elmLock = ./elm.lock;
-          output = "app.js";
+        dev = pkgs.callPackage ./nix { inherit buildElmApplication; };
+
+        prod = dev.override {
+          htmlOptions = { enableOptimizations = true; };
+          cssOptions = { enableOptimizations = true; };
+          elmOptions = {
+            doElmFormat = true;
+            enableOptimizations = true;
+            optimizeLevel = 2;
+          };
         };
       in
       {
@@ -37,8 +39,8 @@
         };
 
         packages = {
-          inherit elmTodosHtml elmTodosCss elmTodosJs;
-          default = elmTodosJs;
+          inherit dev prod;
+          default = dev;
         };
       }
     );
