@@ -20,6 +20,8 @@
           elmLock = ./elm.lock;
           output = "app.js";
         };
+
+        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -37,6 +39,8 @@
         packages = {
           inherit elmTodos;
           default = elmTodos;
+
+          elmTodosHtml = buildHtml { enableOptimizations = true; };
         };
       }
     );
