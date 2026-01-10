@@ -22,6 +22,7 @@
         };
 
         buildHtml = pkgs.callPackage ./nix/build-html.nix {};
+        buildCSS = pkgs.callPackage ./nix/build-css.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -41,6 +42,7 @@
           default = elmTodos;
 
           elmTodosHtml = buildHtml { enableOptimizations = true; };
+          elmTodosCSS = buildCSS { enableOptimizations = true; };
         };
       }
     );
