@@ -16,6 +16,7 @@
         dev = pkgs.callPackage ./nix { inherit buildElmApplication; };
 
         prod = dev.override {
+          enableCompression = true;
           htmlOptions = { enableOptimizations = true; };
           cssOptions = { enableOptimizations = true; };
           elmOptions = {
