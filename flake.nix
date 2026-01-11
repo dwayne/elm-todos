@@ -1,5 +1,11 @@
 {
   inputs = {
+    deploy = {
+      url = "github:dwayne/deploy";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     elm2nix = {
       url = "github:dwayne/elm2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -7,7 +13,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, elm2nix }:
+  outputs = { self, nixpkgs, flake-utils, deploy, elm2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -56,6 +62,7 @@
           name = "elm-todos";
 
           packages = [
+            deploy.packages.${system}.default
             elm2nix.packages.${system}.default
             pkgs.caddy
             pkgs.elmPackages.elm-format
@@ -63,13 +70,18 @@
 
           shellHook = ''
             export PROJECT_ROOT="$PWD"
-            export PATH="$PROJECT_ROOT/bin:$PATH"
             export PS1="($name)\n$PS1"
 
             format () {
               elm-format "$PROJECT_ROOT/src" --yes
             }
-            export -f format
+
+            deploy-prod () {
+              deploy "$@" ${appProd} netlify
+            }
+
+            export -f format deploy-prod
+
             alias f='format'
           '';
         };
