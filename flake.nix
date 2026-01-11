@@ -53,7 +53,7 @@
         };
 
         deployProd = pkgs.writeShellScript "deploy-prod" ''
-          ${deploy.packages.${system}.default}/bin/deploy "$@" ${appProd} netlify
+          ${deploy.packages.${system}.default}/bin/deploy "$@" ${prod} netlify
         '';
 
         mkApp = drv: {
