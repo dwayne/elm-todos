@@ -21,8 +21,13 @@
           cssOptions = { enableOptimizations = true; };
           elmOptions = {
             doElmFormat = true;
+
             enableOptimizations = true;
             optimizeLevel = 2;
+
+            doMinification = true;
+            useTerser = true;
+            outputMin = "app.js";
           };
         };
       in
