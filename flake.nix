@@ -57,9 +57,12 @@
           packages = [
             elm2nix.packages.${system}.default
             pkgs.caddy
+            pkgs.elmPackages.elm-format
           ];
 
           shellHook = ''
+            export PROJECT_ROOT="$PWD"
+            export PATH="$PROJECT_ROOT/bin:$PATH"
             export PS1="($name)\n$PS1"
           '';
         };
