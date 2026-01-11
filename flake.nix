@@ -64,6 +64,12 @@
             export PROJECT_ROOT="$PWD"
             export PATH="$PROJECT_ROOT/bin:$PATH"
             export PS1="($name)\n$PS1"
+
+            format () {
+              elm-format "$PROJECT_ROOT/src" --yes
+            }
+            export -f format
+            alias f='format'
           '';
         };
 

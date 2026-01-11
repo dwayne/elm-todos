@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-#
-# Usage: format [args-for-elm-format]
-#
-
-set -euo pipefail
-
-elm-format "${PROJECT_ROOT:?}/src" "${@:---yes}"
