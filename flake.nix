@@ -13,10 +13,11 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
-        dev = pkgs.callPackage ./nix { inherit buildElmApplication; };
+        dev = pkgs.callPackage ./nix { inherit buildElmApplication; src = ./.; };
 
         prod = dev.override {
           enableCompression = true;
+          includeRedirects = true;
           htmlOptions = { enableOptimizations = true; };
           cssOptions = { enableOptimizations = true; };
           elmOptions = {

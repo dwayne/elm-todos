@@ -1,8 +1,10 @@
 { brotli, callPackage, lib, runCommand, zopfli
 
 , buildElmApplication
+, src
 
 , enableCompression ? false
+, includeRedirects ? false
 , htmlOptions ? {}
 , cssOptions ? {}
 , elmOptions ? { enableDebugger = true; }
@@ -12,8 +14,9 @@ let
   html = callPackage ./build-html.nix htmlOptions;
   css = callPackage ./build-css.nix cssOptions;
   js = buildElmApplication ({
+    inherit src;
+
     name = "elm-todos-js";
-    src = ../.;
     elmLock = ../elm.lock;
     output = "app.js";
   } // elmOptions);
@@ -27,5 +30,9 @@ runCommand "elm-todos" { nativeBuildInputs = [ brotli zopfli ]; } ''
 
   ${lib.optionalString enableCompression ''
     cd "$out" && find . \( -name '*.html' -o -name '*.css' -o -name '*.js' \) -exec brotli "{}" \; -exec zopfli "{}" \;
+  ''}
+
+  ${lib.optionalString includeRedirects ''
+    cp ${src}/public/_redirects "$out"
   ''}
 ''
