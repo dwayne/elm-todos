@@ -6,36 +6,44 @@ An [Elm](https://elm-lang.org/) implementation of the [TodoMVC](https://todomvc.
 
 ## Develop
 
-An isolated, reproducible development environment is provided with [Devbox](https://www.jetify.com/devbox).
+An isolated, reproducible development environment is provided with [Nix](https://nixos.org/).
 
 You can enter its development environment as follows:
 
 ```bash
-$ devbox shell
+nix develop
 ```
-
-**N.B.** *To run the Bash scripts mentioned below you will need to enter the development environment.*
 
 ## Build
 
 To build the development version of the application:
 
 ```bash
-$ build
+nix build
+# or
+nix build .#dev
 ```
 
 To build the production version of the application:
 
 ```bash
-$ build-production
+nix build .#prod
 ```
 
 ## Serve
 
-To serve the development or production version of the application:
+To serve the development version of the application:
 
 ```bash
-$ serve
+nix run
+# or
+nix run .#dev
+```
+
+To serve the production version of the application:
+
+```bash
+nix run .#prod
 ```
 
 ## Deploy
@@ -43,5 +51,11 @@ $ serve
 To deploy the production version of the application to [Netlify](https://www.netlify.com/):
 
 ```bash
-$ deploy-production
+nix run .#deployProd
+```
+
+To simulate the deployment you can do the following:
+
+```bash
+nix run .#deployProd -- -s
 ```
