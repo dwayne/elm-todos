@@ -52,6 +52,10 @@
           config = ./Caddyfile;
         };
 
+        deployProd = pkgs.writeShellScript "deploy-prod" ''
+          ${deploy.packages.${system}.default}/bin/deploy "$@" ${appProd} netlify
+        '';
+
         mkApp = drv: {
           type = "app";
           program = "${drv}";
@@ -75,13 +79,7 @@
             format () {
               elm-format "$PROJECT_ROOT/src" --yes
             }
-
-            deploy-prod () {
-              deploy "$@" ${appProd} netlify
-            }
-
-            export -f format deploy-prod
-
+            export -f format
             alias f='format'
           '';
         };
@@ -93,8 +91,11 @@
 
         apps = {
           default = self.apps.${system}.dev;
+
           dev = mkApp appDev;
           prod = mkApp appProd;
+
+          deployProd = mkApp deployProd;
         };
       }
     );
