@@ -17,9 +17,6 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-
-        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
-        buildCss = pkgs.callPackage ./nix/build-css.nix {};
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
         build = pkgs.callPackage ./nix/build.nix { inherit buildElmApplication; };
@@ -48,13 +45,11 @@
         appDev = serve {
           name = "elm-todos-dev";
           root = dev;
-          config = ./Caddyfile;
         };
 
         appProd = serve {
           name = "elm-todos-prod";
           root = prod;
-          config = ./Caddyfile;
         };
 
         deployProd = pkgs.writeShellScript "deploy-prod" ''
@@ -90,12 +85,6 @@
         };
 
         packages = {
-          html = buildHtml {};
-          minifiedHtml = buildHtml { minify = true; };
-
-          css = buildCss {};
-          minifiedCss = buildCss { minify = true; };
-
           inherit dev prod;
           default = dev;
         };

@@ -1,10 +1,10 @@
 { caddy, writeShellScript }:
 
-{ name   # The name of the script
-, root   # The path to the directory containing the files to be served
-, config # The configuration file
+{ name # The name of the script
+, root # The derivation that contains the files to be served
 
 , port ? 8000
+, config ? ../Caddyfile
 , adapter ? "caddyfile"
 }:
 
