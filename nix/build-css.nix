@@ -1,12 +1,14 @@
-{ lightningcss
-, stdenv
+{ lightningcss, stdenv }:
 
-, enableOptimizations ? false
+{ src
+, inputFile ? "public/index.css"
+, minify ? false
 }:
 
 stdenv.mkDerivation {
-  name = "elm-todos-css";
-  src = ../.;
+  inherit src;
+
+  name = "build-css";
 
   nativeBuildInputs = [
     lightningcss
@@ -15,13 +17,13 @@ stdenv.mkDerivation {
   installPhase =
     let
       buildCssScript =
-        if enableOptimizations then
+        if minify then
           ''
-          lightningcss --minify "public/index.css" --output-file "$out/index.css"
+          lightningcss --minify "${inputFile}" --output-file "$out/index.css"
           ''
         else
           ''
-          cp "public/index.css" "$out"
+          cp "${inputFile}" "$out"
           ''
           ;
     in

@@ -17,6 +17,10 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
+        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
+        buildCss = pkgs.callPackage ./nix/build-css.nix {};
+
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
         dev = pkgs.callPackage ./nix { inherit buildElmApplication; src = ./.; };
@@ -60,8 +64,6 @@
           type = "app";
           program = "${drv}";
         };
-
-        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -87,11 +89,14 @@
         };
 
         packages = {
-          inherit dev prod;
-          default = dev;
-
           html = buildHtml { src = ./.; };
           minifiedHtml = buildHtml { src = ./.; minify = true; };
+
+          css = buildCss { src = ./.; };
+          minifiedCss = buildCss { src = ./.; minify = true; };
+
+          inherit dev prod;
+          default = dev;
         };
 
         apps = {
