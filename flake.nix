@@ -20,16 +20,17 @@
 
         buildHtml = pkgs.callPackage ./nix/build-html.nix {};
         buildCss = pkgs.callPackage ./nix/build-css.nix {};
-
         inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
 
-        dev = pkgs.callPackage ./nix { inherit buildElmApplication; src = ./.; };
+        build = pkgs.callPackage ./nix/build.nix { inherit buildElmApplication; };
 
-        prod = dev.override {
+        dev = build {};
+
+        prod = build {
           enableCompression = true;
           includeRedirects = true;
-          htmlOptions = { enableOptimizations = true; };
-          cssOptions = { enableOptimizations = true; };
+          htmlOptions = { minify = true; };
+          cssOptions = { minify = true; };
           elmOptions = {
             doElmFormat = true;
 

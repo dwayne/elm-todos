@@ -1,14 +1,13 @@
 { html-minifier, stdenv }:
 
-{ src ? ../.
+{ name ? "elm-todos-html"
+, src ? ../.
 , inputDir ? "public"
 , minify ? false
 }:
 
 stdenv.mkDerivation {
-  inherit src;
-
-  name = "build-html";
+  inherit name src;
 
   nativeBuildInputs = [
     html-minifier
@@ -37,7 +36,7 @@ stdenv.mkDerivation {
           ''
         else
           ''
-          cp "${inputDir}"/*.html "$out"
+          cp ${inputDir}/index.html "$out"
           ''
           ;
     in

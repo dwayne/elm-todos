@@ -1,14 +1,13 @@
 { lightningcss, stdenv }:
 
-{ src ? ../.
+{ name ? "elm-todos-css"
+, src ? ../.
 , inputFile ? "public/index.css"
 , minify ? false
 }:
 
 stdenv.mkDerivation {
-  inherit src;
-
-  name = "build-css";
+  inherit name src;
 
   nativeBuildInputs = [
     lightningcss

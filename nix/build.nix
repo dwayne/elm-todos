@@ -1,8 +1,9 @@
 { brotli, callPackage, lib, runCommand, zopfli
 
 , buildElmApplication
-, src
+}:
 
+{ src ? ../.
 , enableCompression ? false
 , includeRedirects ? false
 , htmlOptions ? {}
@@ -11,8 +12,9 @@
 }:
 
 let
-  html = callPackage ./build-html.nix htmlOptions;
-  css = callPackage ./build-css.nix cssOptions;
+  html = callPackage ./build-html.nix {} htmlOptions;
+  css = callPackage ./build-css.nix {} cssOptions;
+
   js = buildElmApplication ({
     inherit src;
 
