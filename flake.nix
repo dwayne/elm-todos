@@ -89,11 +89,11 @@
         };
 
         packages = {
-          html = buildHtml { src = ./.; };
-          minifiedHtml = buildHtml { src = ./.; minify = true; };
+          html = buildHtml {};
+          minifiedHtml = buildHtml { minify = true; };
 
-          css = buildCss { src = ./.; };
-          minifiedCss = buildCss { src = ./.; minify = true; };
+          css = buildCss {};
+          minifiedCss = buildCss { minify = true; };
 
           inherit dev prod;
           default = dev;

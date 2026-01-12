@@ -1,6 +1,6 @@
 { html-minifier, stdenv }:
 
-{ src
+{ src ? ../.
 , inputDir ? "public"
 , minify ? false
 }:

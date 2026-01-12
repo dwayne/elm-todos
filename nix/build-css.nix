@@ -1,6 +1,6 @@
 { lightningcss, stdenv }:
 
-{ src
+{ src ? ../.
 , inputFile ? "public/index.css"
 , minify ? false
 }:
