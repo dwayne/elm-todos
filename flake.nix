@@ -60,6 +60,8 @@
           type = "app";
           program = "${drv}";
         };
+
+        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -87,6 +89,9 @@
         packages = {
           inherit dev prod;
           default = dev;
+
+          html = buildHtml { src = ./.; };
+          minifiedHtml = buildHtml { src = ./.; minify = true; };
         };
 
         apps = {

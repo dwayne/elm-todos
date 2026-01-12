@@ -1,12 +1,14 @@
-{ html-minifier
-, stdenv
+{ html-minifier, stdenv }:
 
-, enableOptimizations ? false
+{ src
+, inputDir ? "public"
+, minify ? false
 }:
 
 stdenv.mkDerivation {
-  name = "elm-todos-html";
-  src = ../.;
+  inherit src;
+
+  name = "build-html";
 
   nativeBuildInputs = [
     html-minifier
@@ -15,7 +17,7 @@ stdenv.mkDerivation {
   installPhase =
     let
       buildHtmlScript =
-        if enableOptimizations then
+        if minify then
           ''
           html-minifier                         \
             --collapse-boolean-attributes       \
@@ -30,12 +32,12 @@ stdenv.mkDerivation {
             --remove-style-link-type-attributes \
             --remove-tag-whitespace             \
             --file-ext html                     \
-            --input-dir "public"                \
+            --input-dir ${inputDir}             \
             --output-dir "$out"
           ''
         else
           ''
-          cp "public/index.html" "$out"
+          cp "${inputDir}"/*.html "$out"
           ''
           ;
     in
