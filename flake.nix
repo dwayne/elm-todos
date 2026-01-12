@@ -97,6 +97,10 @@
 
           deployProd = mkApp deployProd;
         };
+
+        checks = {
+          inherit dev prod;
+        };
       }
     );
 }
