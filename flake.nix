@@ -68,6 +68,7 @@
           packages = [
             deploy.packages.${system}.default
             elm2nix.packages.${system}.default
+            pkgs.actionlint
             pkgs.caddy
             pkgs.elmPackages.elm-format
           ];
