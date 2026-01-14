@@ -4,13 +4,11 @@
 }:
 
 { name ? "elm-todos-html"
-, src ? ../.
-, inputDir ? "public"
+, inputFile ? ../public/index.html
 , minify ? false
 }:
 
 let
-  inputFile = "${src}/${inputDir}/index.html";
   outputFile = "$out/index.html";
   buildHtmlScript =
     if minify then
