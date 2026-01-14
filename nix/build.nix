@@ -3,7 +3,14 @@
 , buildElmApplication
 }:
 
-{ src ? ../.
+let
+  root = ../.;
+  redirects = ../public/_redirects;
+
+  fs = lib.fileset;
+  startFileset = fs.unions [ redirects ../src ../elm.json ../elm.lock ];
+in
+{ src ? fs.toSource { inherit root; fileset = startFileset; }
 , enableCompression ? false
 , includeRedirects ? false
 , htmlOptions ? {}
@@ -16,9 +23,11 @@ let
   css = callPackage ./build-css.nix {} cssOptions;
 
   js = buildElmApplication ({
-    inherit src;
-
     name = "elm-todos-js";
+    src = fs.toSource {
+      inherit root;
+      fileset = fs.difference startFileset redirects;
+    };
     elmLock = ../elm.lock;
     output = "app.js";
   } // elmOptions);
