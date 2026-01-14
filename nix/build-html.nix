@@ -1,4 +1,7 @@
-{ html-minifier, stdenv }:
+{ callPackage, stdenv
+
+, htmlnano ? callPackage ./htmlnano {}
+}:
 
 { name ? "elm-todos-html"
 , src ? ../.
@@ -10,7 +13,7 @@ stdenv.mkDerivation {
   inherit name src;
 
   nativeBuildInputs = [
-    html-minifier
+    htmlnano
   ];
 
   installPhase =
@@ -18,25 +21,11 @@ stdenv.mkDerivation {
       buildHtmlScript =
         if minify then
           ''
-          html-minifier                         \
-            --collapse-boolean-attributes       \
-            --collapse-inline-tag-whitespace    \
-            --collapse-whitespace               \
-            --decode-entities                   \
-            --minify-js                         \
-            --remove-comments                   \
-            --remove-empty-attributes           \
-            --remove-redundant-attributes       \
-            --remove-script-type-attributes     \
-            --remove-style-link-type-attributes \
-            --remove-tag-whitespace             \
-            --file-ext html                     \
-            --input-dir ${inputDir}             \
-            --output-dir "$out"
+          htmlnano ${inputDir}/index.html -o "$out/index.html"
           ''
         else
           ''
-          cp ${inputDir}/index.html "$out"
+          cp ${inputDir}/index.html "$out/index.html"
           ''
           ;
     in

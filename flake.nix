@@ -62,6 +62,9 @@
         };
 
         htmlnano = pkgs.callPackage ./nix/htmlnano {};
+        buildHtml = pkgs.callPackage ./nix/build-html.nix {};
+        html = buildHtml {};
+        minifiedHtml = buildHtml { minify = true; };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -91,7 +94,7 @@
           inherit dev prod;
           default = dev;
 
-          inherit htmlnano;
+          inherit htmlnano html minifiedHtml;
         };
 
         apps = {
@@ -105,6 +108,7 @@
 
         checks = {
           inherit dev prod;
+          inherit htmlnano html minifiedHtml;
         };
       }
     );
