@@ -69,3 +69,7 @@ To simulate the deployment you can do the following:
 ```bash
 nix run .#deployProd -- -s
 ```
+
+## CI
+
+There is a GitHub Action, [`check.yml`](./.github/workflows/check.yml), that runs `nix flake check -L` on every change you push. It uses the [Magic Nix Cache](https://determinate.systems/blog/magic-nix-cache/) to speed up the workflow.
