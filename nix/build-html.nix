@@ -1,4 +1,4 @@
-{ callPackage, stdenv
+{ callPackage, runCommand
 
 , htmlnano ? callPackage ./htmlnano {}
 }:
@@ -9,32 +9,21 @@
 , minify ? false
 }:
 
-stdenv.mkDerivation {
-  inherit name src;
-
-  nativeBuildInputs = [
-    htmlnano
-  ];
-
-  installPhase =
-    let
-      buildHtmlScript =
-        if minify then
-          ''
-          htmlnano ${inputDir}/index.html -o "$out/index.html"
-          ''
-        else
-          ''
-          cp ${inputDir}/index.html "$out/index.html"
-          ''
-          ;
-    in
-    ''
-    runHook preInstall
-
-    mkdir "$out"
-    ${buildHtmlScript}
-
-    runHook postInstall
-    '';
-}
+let
+  inputFile = "${src}/${inputDir}/index.html";
+  outputFile = "$out/index.html";
+  buildHtmlScript =
+    if minify then
+      ''
+      htmlnano ${inputFile} -o ${outputFile}
+      ''
+    else
+      ''
+      cp ${inputFile} ${outputFile}
+      ''
+      ;
+in
+runCommand name { nativeBuildInputs = [ htmlnano ]; } ''
+  mkdir "$out"
+  ${buildHtmlScript}
+''
