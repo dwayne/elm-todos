@@ -65,6 +65,10 @@
         buildHtml = pkgs.callPackage ./nix/build-html.nix {};
         html = buildHtml {};
         minifiedHtml = buildHtml { minify = true; };
+
+        buildCss = pkgs.callPackage ./nix/build-css.nix {};
+        css = buildCss {};
+        minifiedCss = buildCss { minify = true; };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -95,6 +99,7 @@
           default = dev;
 
           inherit htmlnano html minifiedHtml;
+          inherit css minifiedCss;
         };
 
         apps = {
@@ -109,6 +114,7 @@
         checks = {
           inherit dev prod;
           inherit htmlnano html minifiedHtml;
+          inherit css minifiedCss;
         };
       }
     );

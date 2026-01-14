@@ -1,37 +1,18 @@
-{ lightningcss, stdenv }:
+{ lightningcss, runCommand }:
 
-{ name ? "elm-todos-css"
-, src ? ../.
-, inputFile ? "public/index.css"
-, minify ? false
-}:
+{ minify ? false }:
 
-stdenv.mkDerivation {
-  inherit name src;
-
-  nativeBuildInputs = [
-    lightningcss
-  ];
-
-  installPhase =
-    let
-      buildCssScript =
-        if minify then
-          ''
-          lightningcss --minify "${inputFile}" --output-file "$out/index.css"
-          ''
-        else
-          ''
-          cp "${inputFile}" "$out"
-          ''
-          ;
-    in
-    ''
-    runHook preInstall
-
-    mkdir "$out"
-    ${buildCssScript}
-
-    runHook postInstall
-    '';
-}
+let
+  name = "elm-todos-css";
+  inputFile = ../public/index.css;
+  outputFile = "$out/index.css";
+  buildCssScript =
+    if minify then
+      "lightningcss --minify ${inputFile} --output-file ${outputFile}"
+    else
+      "cp ${inputFile} ${outputFile}";
+in
+runCommand name { nativeBuildInputs = [ lightningcss ]; } ''
+  mkdir "$out"
+  ${buildCssScript}
+''
