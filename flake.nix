@@ -60,6 +60,8 @@
           type = "app";
           program = "${drv}";
         };
+
+        htmlnano = pkgs.callPackage ./nix/htmlnano {};
       in
       {
         devShells.default = pkgs.mkShell {
@@ -88,6 +90,8 @@
         packages = {
           inherit dev prod;
           default = dev;
+
+          inherit htmlnano;
         };
 
         apps = {
