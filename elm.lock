@@ -1,0 +1,44 @@
+[
+    {
+        "author": "elm",
+        "package": "browser",
+        "version": "1.0.2",
+        "sha256": "0863nw2hhbpm3s03lm1imi5x28wwknzrwg2p79s5mydgvdvgwjf0"
+    },
+    {
+        "author": "elm",
+        "package": "core",
+        "version": "1.0.5",
+        "sha256": "0g3xbi8f9k5q45s95nx3jfvzwdf4b2n63a52wr4027d2xjx0pmvl"
+    },
+    {
+        "author": "elm",
+        "package": "html",
+        "version": "1.0.1",
+        "sha256": "1m045b6cixyqygll4cjf9d9s3k1lj839kxc3gbid0fpqc4g10i6b"
+    },
+    {
+        "author": "elm",
+        "package": "json",
+        "version": "1.1.4",
+        "sha256": "0niq7id7r78ckvgap4psq0xdlnhcv1dz2j81lrnhl4fsgn0awvs8"
+    },
+    {
+        "author": "elm",
+        "package": "time",
+        "version": "1.0.0",
+        "sha256": "0wqa2vhl1zf8z0j2yd3yjwfhr0dydfns43bbzll3k4rhnjadxr1l"
+    },
+    {
+        "author": "elm",
+        "package": "url",
+        "version": "1.0.0",
+        "sha256": "1f2ij4i7zmijnj2i50qf19lpkr14bhms8dkq029inb5mydi9f8gs"
+    },
+    {
+        "author": "elm",
+        "package": "virtual-dom",
+        "version": "1.0.5",
+        "sha256": "16v6h8msm1yin45vwdj8g0wnqs4gjjyknhz2iamrzzbssxvryyqv"
+    }
+]
