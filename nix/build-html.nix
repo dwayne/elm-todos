@@ -1,6 +1,6 @@
 { callPackage, runCommand
 
-, htmlnano ? callPackage ./htmlnano {}
+, htmlnano ? callPackage ./htmlnano.nix {}
 }:
 
 { minify ? false }:
