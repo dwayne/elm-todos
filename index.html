@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport"content="width=device-width,initial-scale=1"><title>Elm Todos</title><link rel="stylesheet"href="/index.css"></head><body><div id="app"></div><script src="/app.js"></script><script>function toData(json) {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Elm Todos</title><link rel="stylesheet" href="/index.css"></head><body> <div id="app"></div> <script src="/app.js"></script> <script>
+      function toData(json) {
         if (json) {
           try {
             return JSON.parse(json);
@@ -19,4 +20,5 @@
 
       app.ports.save.subscribe(function (data) {
         localStorage.setItem(key, JSON.stringify(data));
-      });</script></body></html>
+      });
+    </script> </body></html>
