@@ -78,11 +78,14 @@
             export PROJECT_ROOT="$PWD"
             export PS1="($name)\n$PS1"
 
-            format () {
+            f () {
               elm-format "$PROJECT_ROOT/src" --yes
             }
-            export -f format
-            alias f='format'
+
+            echo "Elm development environment loaded"
+            echo ""
+            echo "Type 'f' to run elm-format"
+            echo ""
           '';
         };
 
