@@ -56,9 +56,10 @@
           ${deploy.packages.${system}.default}/bin/deploy "$@" ${prod} netlify
         '';
 
-        mkApp = drv: {
+        mkApp = { drv, description }: {
           type = "app";
           program = "${drv}";
+          meta.description = description;
         };
       in
       {
@@ -93,10 +94,20 @@
         apps = {
           default = self.apps.${system}.dev;
 
-          dev = mkApp appDev;
-          prod = mkApp appProd;
+          dev = mkApp {
+            drv = appDev;
+            description = "The development version of the TodoMVC web application";
+          };
 
-          deployProd = mkApp deployProd;
+          prod = mkApp {
+            drv = appProd;
+            description = "The production version of the TodoMVC web application";
+          };
+
+          deployProd = mkApp {
+            drv = deployProd;
+            description = "The production deployment script";
+          };
         };
 
         checks = {
