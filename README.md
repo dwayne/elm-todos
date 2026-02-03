@@ -51,23 +51,21 @@ nix run .#prod
 Run various checks to ensure that the flake is valid and that the development and production versions of the application can be built.
 
 ```bash
-nix flake check
+nix flake check -L
 ```
-
-There is also a GitHub Action workflow, [check.yml](.github/workflows/check.yml), that does the same thing on every push.
 
 ## Deploy
 
 To deploy the production version of the application to [Netlify](https://www.netlify.com/):
 
 ```bash
-nix run .#deployProd
+nix run .#deploy
 ```
 
 To simulate the deployment you can do the following:
 
 ```bash
-nix run .#deployProd -- -s
+nix run .#deploy -- -s
 ```
 
 ## CI

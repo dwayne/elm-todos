@@ -42,12 +42,12 @@
 
         serve = pkgs.callPackage ./nix/serve.nix {};
 
-        appDev = serve {
+        serveDev = serve {
           name = "elm-todos-dev";
           root = dev;
         };
 
-        appProd = serve {
+        serveProd = serve {
           name = "elm-todos-prod";
           root = prod;
         };
@@ -98,23 +98,23 @@
           default = self.apps.${system}.dev;
 
           dev = mkApp {
-            drv = appDev;
-            description = "The development version of the TodoMVC web application";
+            drv = serveDev;
+            description = "Serve the development version of the TodoMVC web application";
           };
 
           prod = mkApp {
-            drv = appProd;
-            description = "The production version of the TodoMVC web application";
+            drv = serveProd;
+            description = "Serve the production version of the TodoMVC web application";
           };
 
-          deployProd = mkApp {
+          deploy = mkApp {
             drv = deployProd;
-            description = "The production deployment script";
+            description = "Deploy the production version of the TodoMVC web application";
           };
         };
 
         checks = {
-          inherit dev prod;
+          inherit dev prod serveDev serveProd deployProd;
         };
       }
     );
