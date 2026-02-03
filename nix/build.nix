@@ -10,7 +10,8 @@ let
   fs = lib.fileset;
   startFileset = fs.unions [ redirects ../src ../elm.json ../elm.lock ];
 in
-{ src ? fs.toSource { inherit root; fileset = startFileset; }
+{ name
+, src ? fs.toSource { inherit root; fileset = startFileset; }
 , enableCompression ? false
 , includeRedirects ? false
 , htmlOptions ? {}
@@ -19,11 +20,11 @@ in
 }:
 
 let
-  html = callPackage ./build-html.nix {} htmlOptions;
-  css = callPackage ./build-css.nix {} cssOptions;
+  html = callPackage ./build-html.nix {} (htmlOptions // { inherit name; });
+  css = callPackage ./build-css.nix {} (cssOptions // { inherit name; });
 
   js = buildElmApplication ({
-    name = "elm-todos-js";
+    name = "${name}-js";
     src = fs.toSource {
       inherit root;
       fileset = fs.difference startFileset redirects;
@@ -32,7 +33,7 @@ let
     output = "app.js";
   } // elmOptions);
 in
-runCommand "elm-todos" { nativeBuildInputs = [ brotli zopfli ]; } ''
+runCommand name { nativeBuildInputs = [ brotli zopfli ]; } ''
   mkdir "$out"
 
   cp ${html}/index.html "$out"

@@ -21,9 +21,10 @@
 
         build = pkgs.callPackage ./nix/build.nix { inherit buildElmApplication; };
 
-        dev = build {};
+        dev = build { name = "elm-todos-dev"; };
 
         prod = build {
+          name = "elm-todos-prod";
           enableCompression = true;
           includeRedirects = true;
           htmlOptions = { minify = true; };
@@ -43,16 +44,16 @@
         serve = pkgs.callPackage ./nix/serve.nix {};
 
         serveDev = serve {
-          name = "elm-todos-dev";
+          name = "serve-elm-todos-dev";
           root = dev;
         };
 
         serveProd = serve {
-          name = "elm-todos-prod";
+          name = "serve-elm-todos-prod";
           root = prod;
         };
 
-        deployProd = pkgs.writeShellScript "deploy-prod" ''
+        deployProd = pkgs.writeShellScript "deploy-elm-todos-prod" ''
           ${deploy.packages.${system}.default}/bin/deploy "$@" ${prod} netlify
         '';
 
@@ -71,6 +72,7 @@
             elm2nix.packages.${system}.default
             pkgs.actionlint
             pkgs.caddy
+            pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
           ];
 

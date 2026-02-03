@@ -3,10 +3,11 @@
 , htmlnano ? callPackage ./htmlnano.nix {}
 }:
 
-{ minify ? false }:
+{ name
+, minify ? false
+}:
 
 let
-  name = "elm-todos-html";
   inputFile = ../public/index.html;
   outputFile = "$out/index.html";
   buildHtmlScript =
@@ -15,7 +16,7 @@ let
     else
       "cp ${inputFile} ${outputFile}";
 in
-runCommand name { nativeBuildInputs = [ htmlnano ]; } ''
+runCommand "${name}-html" { nativeBuildInputs = [ htmlnano ]; } ''
   mkdir "$out"
   ${buildHtmlScript}
 ''

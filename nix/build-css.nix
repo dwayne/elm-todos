@@ -1,9 +1,10 @@
 { lightningcss, runCommand }:
 
-{ minify ? false }:
+{ name
+, minify ? false
+}:
 
 let
-  name = "elm-todos-css";
   inputFile = ../public/index.css;
   outputFile = "$out/index.css";
   buildCssScript =
@@ -12,7 +13,7 @@ let
     else
       "cp ${inputFile} ${outputFile}";
 in
-runCommand name { nativeBuildInputs = [ lightningcss ]; } ''
+runCommand "${name}-css" { nativeBuildInputs = [ lightningcss ]; } ''
   mkdir "$out"
   ${buildCssScript}
 ''
