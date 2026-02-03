@@ -1,7 +1,11 @@
 name: Check
 
 on:
-  push
+  push:
+    branches-ignore:
+      - master
+
+  workflow_call:
 
 jobs:
   check:
