@@ -79,7 +79,7 @@
             export PS1="($name)\n$PS1"
 
             f () {
-              elm-format "$PROJECT_ROOT/src" --yes
+              elm-format "$PROJECT_ROOT/src" "''${@:---yes}"
             }
 
             echo "Elm development environment loaded"
