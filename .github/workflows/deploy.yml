@@ -10,13 +10,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check:
-    uses: ./.github/workflows/check.yml
+  ci:
+    uses: ./.github/workflows/ci.yml
 
   deploy:
+    needs: [ci]
+
     permissions:
       contents: write
-    needs: [check]
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
