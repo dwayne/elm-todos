@@ -15,14 +15,7 @@
     let
       lib = nixpkgs.lib;
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-      eachSupportedSystem = f:
-        lib.foldAttrs
-          lib.mergeAttrs
-          {}
-          (map
-            (s: lib.mapAttrs (_: v: { ${s} = v; }) (f s))
-            supportedSystems
-          );
+      eachSupportedSystem = f: lib.foldAttrs lib.mergeAttrs {} (map (s: lib.mapAttrs (_: v: { ${s} = v; }) (f s)) supportedSystems);
     in
     eachSupportedSystem (system:
       let
@@ -32,67 +25,29 @@
         };
 
         elm2nixLib = flake-elm2nix.lib.mkLib pkgs;
-        inherit (elm2nixLib) elm2nix buildElmApplication;
-
         deploy = flake-deploy.lib.mkDeploy pkgs;
 
-        project = pkgs.callPackage ./nix {
-          inherit buildElmApplication deploy;
-        };
-
-        elmSpa = project.buildElmSpa {
-          root = ./.;
-        };
-
-        dev = elmSpa.override {
-          name = "elm-todos-dev";
-          enableDebugger = true;
-        };
-
-        prod = elmSpa.override {
-          name = "elm-todos-prod";
-
-          minifyHtml = true;
-          minifyCss = true;
-          enableCompression = true;
-          includeRedirects = true;
-          deployBranch = "netlify";
-
-          doElmFormat = true;
-
-          enableOptimizations = true;
-          optimizeLevel = 2;
-
-          doMinification = true;
-          useTerser = true;
-        };
+        inherit (elm2nixLib) elm2nix;
       in
       {
         devShells.default = pkgs.mkShell {
           name = "elm-todos";
 
           packages = [
+            deploy
             elm2nix
-            pkgs.actionlint
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
           ];
         };
 
         packages = {
-          inherit dev prod;
-          default = dev;
         };
 
         apps = {
-          default = self.apps.${system}.dev;
-          dev = dev.serveApp;
-          prod = prod.serveApp;
-          deploy = prod.deployApp;
         };
 
         checks = {
-          inherit dev prod;
         };
       }
     );
