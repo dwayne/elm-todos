@@ -28,6 +28,16 @@
         deploy = flake-deploy.lib.mkDeploy pkgs;
 
         inherit (elm2nixLib) elm2nix;
+
+        project = pkgs.callPackage ./nix {
+          inherit elm2nixLib;
+        };
+
+        site = project.build {
+          name = "elm-todos";
+          root = ./.;
+          hash = "sha256-cXsDLkKnVZbkq7to5ePX0VgCAlmxNlAUfYf6lkg8+mE=";
+        };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -39,7 +49,7 @@
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
             pkgs.nodejs-slim_24
-            pkgs.pnpm
+            pkgs.pnpm_12
           ];
 
           env = {
@@ -57,6 +67,7 @@
         };
 
         packages = {
+          inherit site;
         };
 
         apps = {
