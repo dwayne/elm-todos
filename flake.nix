@@ -42,6 +42,10 @@
             pkgs.pnpm
           ];
 
+          env = {
+            PORT = 8000;
+          };
+
           shellHook = ''
             export PROJECT_ROOT="$PWD"
             export PATH="$PROJECT_ROOT/node_modules/.bin:$PATH"
