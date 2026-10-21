@@ -4,8 +4,8 @@
 , fetchPnpmDeps
 , lib
 , mkServe
-, nodejs-slim_24
-, pnpm_12
+, nodejs
+, pnpm
 , pnpmConfigHook
 , stdenv
 , writeShellApplication
@@ -22,9 +22,6 @@ lib.makeOverridable (
   , deployBranch ? "gh-pages"
   }:
   let
-    nodejs = nodejs-slim_24;
-    pnpm = pnpm_12;
-
     fs = lib.fileset;
     paths = defaultPaths ++ extraPaths;
 

@@ -41,28 +41,7 @@
       {
         devShells.default = pkgs.mkShell {
           name = "elm-todos";
-
-          packages = [
-            deploy
-            elm2nixLib.elm2nix
-            pkgs.elmPackages.elm
-            pkgs.elmPackages.elm-format
-            pkgs.nodejs-slim_24
-            pkgs.pnpm_12
-          ];
-
-          env = {
-            PORT = 8000;
-          };
-
-          shellHook = ''
-            export PROJECT_ROOT="$PWD"
-            export PATH="$PROJECT_ROOT/node_modules/.bin:$PATH"
-
-            if [ ! -d "$PROJECT_ROOT/node_modules" ]; then
-              pnpm install --loglevel warn
-            fi
-          '';
+          inputsFrom = [ project.devShell ];
         };
 
         packages = {
