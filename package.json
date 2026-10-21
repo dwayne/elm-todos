@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "dev": "parcel",
     "build": "parcel build --reporter parcel-reporter-static-files-copy"
   },
   "source": "src/index.html",
