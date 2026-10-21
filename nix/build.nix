@@ -18,6 +18,7 @@ lib.makeOverridable (
   , defaultPaths ? [ "public" "src" "elm.json" "package.json" "pnpm-lock.yaml" "pnpm-workspace.yaml" ]
   , extraPaths ? []
   , elmLockFilename ? "elm.lock"
+  , patches ? []
   , port ? 8000
   , deployBranch ? "gh-pages"
   }:
@@ -54,6 +55,8 @@ lib.makeOverridable (
       runHook preBuild
 
       ${elm2nixLib.prepareElmHomeScript { inherit elmLock registryDat; }}
+      ${elm2nixLib.installPatchesScript patches}
+
       pnpm build
 
       runHook postBuild
