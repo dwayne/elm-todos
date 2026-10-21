@@ -38,7 +38,18 @@
             elm2nix
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
+            pkgs.nodejs-slim_24
+            pkgs.pnpm
           ];
+
+          shellHook = ''
+            export PROJECT_ROOT="$PWD"
+            export PATH="$PROJECT_ROOT/node_modules/.bin:$PATH"
+
+            if [ ! -d "$PROJECT_ROOT/node_modules" ]; then
+              pnpm install --loglevel warn
+            fi
+          '';
         };
 
         packages = {

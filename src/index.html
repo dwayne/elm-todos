@@ -6,12 +6,13 @@
 
     <title>Elm Todos</title>
 
-    <link rel="stylesheet" href="/index.css" />
+    <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
     <div id="app"></div>
-    <script src="/app.js"></script>
-    <script>
+    <script type="module">
+      import { Elm } from "./Main.elm";
+
       function toData(json) {
         if (json) {
           try {
