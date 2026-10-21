@@ -14,6 +14,9 @@ importers:
       parcel:
         specifier: ^2.16.4
         version: 2.16.4(@swc/helpers@0.5.23)
+      parcel-reporter-static-files-copy:
+        specifier: ^1.5.3
+        version: 1.5.3(@parcel/core@2.16.4(@swc/helpers@0.5.23))
 
 packages:
 
@@ -868,6 +871,10 @@ packages:
 
   ordered-binary@1.6.3:
     resolution: {integrity: sha512-Bc8LnA2x4ZHRQ9LjCm/NOdD3+CTQPhGNu8m7/6+ERtiB6Bb/fn7nCySwcmAC+5WCqwelpSAQgo1VX9BGpsC0tQ==}
+
+  parcel-reporter-static-files-copy@1.5.3:
+    resolution: {integrity: sha512-Ukq2SyJYn3GFIPCLamXuQ+2t+0j54llujjOUoRjtmVvfsuGnJDEpMznADeIoKuQDvy0jpxtWzWkQvxqI/j+U4A==}
+    engines: {parcel: ^2.0.0-beta.1}
 
   parcel@2.16.4:
     resolution: {integrity: sha512-RQlrqs4ujYNJpTQi+dITqPKNhRWEqpjPd1YBcGp50Wy3FcJHpwu0/iRm7XWz2dKU/Bwp2qCcVYPIeEDYi2uOUw==}
@@ -2034,6 +2041,13 @@ snapshots:
       wrappy: 1.0.2
 
   ordered-binary@1.6.3: {}
+
+  parcel-reporter-static-files-copy@1.5.3(@parcel/core@2.16.4(@swc/helpers@0.5.23)):
+    dependencies:
+      '@parcel/plugin': 2.16.4(@parcel/core@2.16.4(@swc/helpers@0.5.23))
+    transitivePeerDependencies:
+      - '@parcel/core'
+      - napi-wasm
 
   parcel@2.16.4(@swc/helpers@0.5.23):
     dependencies:
