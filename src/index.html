@@ -3,38 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <title>Elm Todos</title>
-
     <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
     <div id="app"></div>
-    <script type="module">
-      import { Elm } from "./Main.elm";
-
-      function toData(json) {
-        if (json) {
-          try {
-            return JSON.parse(json);
-          } catch (e) {
-            console.error("The JSON is corrupt", json, e);
-          }
-        }
-        return null;
-      }
-
-      const key = "elm-todos-data";
-      const json = localStorage.getItem(key);
-      const data = toData(json);
-      const app = Elm.Main.init({
-        node: document.getElementById("app"),
-        flags: data
-      });
-
-      app.ports.save.subscribe(function (data) {
-        localStorage.setItem(key, JSON.stringify(data));
-      });
-    </script>
+    <script type="module" src="./index.js"></script>
   </body>
 </html>
