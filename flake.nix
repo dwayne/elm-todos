@@ -27,16 +27,15 @@
         elm2nixLib = flake-elm2nix.lib.mkLib pkgs;
         deploy = flake-deploy.lib.mkDeploy pkgs;
 
-        inherit (elm2nixLib) elm2nix;
-
         project = pkgs.callPackage ./nix {
-          inherit elm2nixLib;
+          inherit elm2nixLib deploy;
         };
 
         site = project.build {
           name = "elm-todos";
           root = ./.;
           hash = "sha256-cXsDLkKnVZbkq7to5ePX0VgCAlmxNlAUfYf6lkg8+mE=";
+          deployBranch = "netlify";
         };
       in
       {
@@ -45,7 +44,7 @@
 
           packages = [
             deploy
-            elm2nix
+            elm2nixLib.elm2nix
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
             pkgs.nodejs-slim_24
@@ -74,6 +73,7 @@
         apps = {
           default = site.serveApp;
           serve = site.serveApp;
+          deploy = site.deployApp;
         };
 
         checks = { inherit site; };

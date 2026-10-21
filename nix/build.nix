@@ -1,4 +1,5 @@
-{ elmPackages
+{ deploy
+, elmPackages
 , elm2nixLib
 , fetchPnpmDeps
 , lib
@@ -7,6 +8,7 @@
 , pnpm_12
 , pnpmConfigHook
 , stdenv
+, writeShellApplication
 }:
 
 lib.makeOverridable (
@@ -17,6 +19,7 @@ lib.makeOverridable (
   , extraPaths ? []
   , elmLockFilename ? "elm.lock"
   , port ? 8000
+  , deployBranch ? "gh-pages"
   }:
   let
     nodejs = nodejs-slim_24;
@@ -80,7 +83,25 @@ lib.makeOverridable (
           program = lib.getExe serve;
           meta.description = "Serve ${finalAttrs.name}";
         };
+
+        deploySite = writeShellApplication {
+          name = "deploy-${finalAttrs.name}";
+          runtimeInputs = [ deploy ];
+          text = ''
+            exec deploy "$@" "${finalAttrs.finalPackage}" "${deployBranch}"
+          '';
+        };
+
+        deploySiteApp = {
+          type = "app";
+          program = lib.getExe deploySite;
+          meta.description = "Deploy ${finalAttrs.name}";
+        };
       in
-      { inherit serve serveApp; };
+      {
+        inherit serve serveApp;
+        deploy = deploySite;
+        deployApp = deploySiteApp;
+      };
   })
 )
