@@ -2,6 +2,7 @@
 , elm2nixLib
 , fetchPnpmDeps
 , lib
+, mkServe
 , nodejs-slim_24
 , pnpm_12
 , pnpmConfigHook
@@ -15,6 +16,7 @@ lib.makeOverridable (
   , defaultPaths ? [ "public" "src" "elm.json" "package.json" "pnpm-lock.yaml" "pnpm-workspace.yaml" ]
   , extraPaths ? []
   , elmLockFilename ? "elm.lock"
+  , port ? 8000
   }:
   let
     nodejs = nodejs-slim_24;
@@ -64,5 +66,21 @@ lib.makeOverridable (
 
       runHook postInstall
     '';
+
+    passthru =
+      let
+        serve = mkServe {
+          inherit port;
+          name = "serve-${finalAttrs.name}";
+          root = finalAttrs.finalPackage;
+        };
+
+        serveApp = {
+          type = "app";
+          program = lib.getExe serve;
+          meta.description = "Serve ${finalAttrs.name}";
+        };
+      in
+      { inherit serve serveApp; };
   })
 )

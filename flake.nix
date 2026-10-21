@@ -68,13 +68,15 @@
 
         packages = {
           inherit site;
+          default = site;
         };
 
         apps = {
+          default = site.serveApp;
+          serve = site.serveApp;
         };
 
-        checks = {
-        };
+        checks = { inherit site; };
       }
     );
 }
