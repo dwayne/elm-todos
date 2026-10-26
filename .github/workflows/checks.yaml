@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   checks:
-    uses: dwayne/nix-elm-parcel/.github/workflows/reusable-checks.yml@198fbd02d6f20ec6efedb41a8c9754fc1e7a9691
+    uses: dwayne/nix-elm-parcel/.github/workflows/reusable-checks.yaml@1afc13572c039b7aff937d0b38acaab61f0c6fbf
     #
     # Optional: Run checks on more systems (x86_64-linux always runs)
     #

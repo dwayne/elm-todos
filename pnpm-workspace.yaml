@@ -3,9 +3,3 @@ allowBuilds:
   '@swc/core': true
   lmdb: true
   msgpackr-extract: true
-
-autoInstallPeers: false
-
-peerDependencyRules:
-  ignoreMissing:
-    - elm

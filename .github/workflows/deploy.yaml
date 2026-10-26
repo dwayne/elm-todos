@@ -11,6 +11,6 @@ jobs:
     # Manual dispatch can run from any branch; only deploy from master or main.
     #
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-    uses: dwayne/nix-elm-parcel/.github/workflows/reusable-deploy.yml@198fbd02d6f20ec6efedb41a8c9754fc1e7a9691
+    uses: dwayne/nix-elm-parcel/.github/workflows/reusable-deploy.yaml@1afc13572c039b7aff937d0b38acaab61f0c6fbf
     permissions:
       contents: write
