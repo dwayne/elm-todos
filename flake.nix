@@ -1,47 +1,41 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-elm2nix = {
-      url = "github:dwayne/elm2nix/use-elm-0.19.3";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    flake-deploy = {
-      url = "github:dwayne/deploy";
-      inputs.nixpkgs.follows = "nixpkgs";
+    nix-utils-src = { url = "github:dwayne/nix-utils"; flake = false; };
+    flake-nix-elm-parcel = {
+      url = "github:dwayne/nix-elm-parcel";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nix-utils-src.follows = "nix-utils-src";
+      };
     };
   };
 
-  outputs = { self, nixpkgs, flake-elm2nix, flake-deploy }:
+  outputs = { self, nixpkgs, nix-utils-src, flake-nix-elm-parcel }:
     let
+      name = "example";
+      hash = "sha256-c1evKKWUS+PTMgSowmBm6lNaVOKOYNLpkZuLQu5Ol7w=";
+
       lib = nixpkgs.lib;
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-      eachSupportedSystem = f: lib.foldAttrs lib.mergeAttrs {} (map (s: lib.mapAttrs (_: v: { ${s} = v; }) (f s)) supportedSystems);
+      nixUtils = import nix-utils-src lib;
     in
-    eachSupportedSystem (system:
+    nixUtils.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ flake-elm2nix.overlays.default ];
+          overlays = [ flake-nix-elm-parcel.overlays.default ];
         };
 
-        elm2nixLib = flake-elm2nix.lib.mkLib pkgs;
-        deploy = flake-deploy.lib.mkDeploy pkgs;
-
-        project = pkgs.callPackage ./nix {
-          inherit elm2nixLib deploy;
-        };
-
-        site = project.build {
-          name = "elm-todos";
+        site = pkgs.nixElmParcelPackages.build {
+          inherit name hash;
           root = ./.;
-          hash = "sha256-cXsDLkKnVZbkq7to5ePX0VgCAlmxNlAUfYf6lkg8+mE=";
           deployBranch = "netlify";
         };
       in
       {
         devShells.default = pkgs.mkShell {
-          name = "elm-todos";
-          inputsFrom = [ project.devShell ];
+          inherit name;
+          inputsFrom = [ pkgs.nixElmParcelPackages.devShell ];
         };
 
         packages = {
@@ -50,9 +44,8 @@
         };
 
         apps = {
-          default = site.serveApp;
-          serve = site.serveApp;
-          deploy = site.deployApp;
+          inherit (site) serve deploy;
+          default = site.serve;
         };
 
         checks = { inherit site; };

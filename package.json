@@ -2,14 +2,15 @@
   "private": true,
   "scripts": {
     "dev": "parcel",
-    "build": "parcel build --reporter parcel-reporter-static-files-copy"
+    "build": "parcel build"
   },
   "source": "src/index.html",
   "staticFiles": {
     "staticPath": "public"
   },
   "devDependencies": {
-    "@parcel/transformer-elm": "2.16.4",
+    "@parcel/config-default": "^2.16.4",
+    "@parcel/transformer-elm": "^2.16.4",
     "parcel": "^2.16.4",
     "parcel-reporter-static-files-copy": "^1.5.3"
   }
