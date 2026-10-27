@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "parcel",
-    "build": "parcel build"
+    "build": "parcel build --public-url ./"
   },
   "source": "src/index.html",
   "staticFiles": {
