@@ -1,8 +1,15 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: false
+  autoInstallPeers: true
   excludeLinksFromLockfile: false
+
+overrides:
+  '@parcel/transformer-elm>elm': '-'
+
+pnpmfileChecksum: sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+
+untrackedPnpmfileReadPackageHook: false
 
 importers:
 
@@ -350,8 +357,6 @@ packages:
   '@parcel/transformer-elm@2.16.4':
     resolution: {integrity: sha512-ruLiVrIYiJaygp3Oqnk7ou7dsnNOVpJn5Z3xv+M4H9sE6A3+ZSDvrpJe5Cvs/yglY4795RQ6P3CIuri1f3sXRA==}
     engines: {node: '>= 16.0.0', parcel: ^2.16.4}
-    peerDependencies:
-      elm: ^0.19.1-5
 
   '@parcel/transformer-html@2.16.4':
     resolution: {integrity: sha512-w6JErYTeNS+KAzUAER18NHFIFFvxiLGd4Fht1UYcb/FDjJdLAMB/FljyEs0Rto/WAhZ2D0MuSL25HQh837R62g==}
